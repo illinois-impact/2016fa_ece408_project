@@ -1,10 +1,10 @@
 #include <assert.h>
 #include "hdf5.h"
 
-#define DATA "test2.hdf5"
+#define DATA "data.hdf5"
 #define MODEL "model.hdf5"
 
-#define BATCH_SIZE 2
+#define BATCH_SIZE 10000
 #define NUM_ROWS 28
 #define NUM_COLS 28
 #define NUM_CHANNELS 1
