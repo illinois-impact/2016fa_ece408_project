@@ -6,11 +6,11 @@ import h5py
 
 def main():
     # Load data.
-    f = h5py.File('dataset.hdf5', 'r')
-    X = f['X'][:]
+    f = h5py.File('data.hdf5', 'r')
+    X = f['x'][:]
     Y = f['y'][:]
-
     f.close()
+
     # Load model. Expected to get ~97% accuracy on the provided data.
     f = h5py.File('model.hdf5', 'r')
     conv1 = f['conv1'][:]
@@ -21,19 +21,10 @@ def main():
 
     num_correct = 0
     num_total = 0
-    print "idx\tguess\tcheck\tcorrectness"
-    for idx in range(len(X)):
-        guess = forward_operation(
-            X[idx:idx + 1], conv1, conv2, fc1, fc2)[0]  # keep 4-dimensional
-        check = np.argmax(Y[idx])
-        if guess == check:
-            num_correct += 1
-        print '\t'.join(str(x) for x in (idx, guess, check, (num_correct * 100.0) / (idx + 1)))
-
         # Show the first two images.
         # scipy.misc.imshow(X[0:1,:,:,:].squeeze())  # 7
         # scipy.misc.imshow(X[1:2,:,:,:].squeeze())  # 2
-    # print forward_operation(X[0:2, :, :, :], conv1, conv2, fc1, fc2)
+    print forward_operation(X, conv1, conv2, fc1, fc2)
 
 
 def forward_operation(X, conv1, conv2, fc1, fc2):
@@ -51,11 +42,12 @@ def forward_operation(X, conv1, conv2, fc1, fc2):
     net = fully_forwrad(net, fc1)  # batch_size x 128
     net = relu(net)  # batch_size x 128
     net = fully_forwrad(net, fc2)  # batch_size x 10
+
     return np.argmax(net, 1)  # batch_size x 1
 
 
 def conv_forward_valid(X, W):
-    '''Implemented following the notes'''
+    '''Implemented following the notes in Figure 16.4'''
 
     # Unnamed variable is num_channels
     batch_size, num_rows, num_cols, _ = X.shape
@@ -82,7 +74,7 @@ def relu(X):
 
 
 def average_pool(X, pool_size=2):
-    ''' Implemented following the notes.'''
+    ''' Implemented following the notes in Figure 16.5'''
     batch_size, H, W, M = X.shape  # batch_size, height, width, channels.
     Y = np.zeros((batch_size, H / pool_size, W / pool_size, M))
     for i in range(0, batch_size):
@@ -97,7 +89,7 @@ def average_pool(X, pool_size=2):
 
 
 def fully_forwrad(X, W):
-    '''Just matrix multiplication...'''
+    '''matrix multiplication...'''
     return np.dot(X, W)
 
 if __name__ == '__main__':
