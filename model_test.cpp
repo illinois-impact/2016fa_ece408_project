@@ -1,10 +1,10 @@
 #include <assert.h>
 #include "hdf5.h"
 
-#define DATA "test100.hdf5"
+#define DATA "test2.hdf5"
 #define MODEL "model.hdf5"
 
-#define BATCH_SIZE 99
+#define BATCH_SIZE 2
 #define NUM_ROWS 28
 #define NUM_COLS 28
 #define NUM_CHANNELS 1
@@ -108,7 +108,6 @@ void relu4(float *X, int xdims[4]) {
       X[i] = (X[i] < 0) ? 0 : X[i];
 }
 
-
 // Recified linear unit 2d
 void relu2(float *X, int xdims[2]) {
    for (int i = 0; i < xdims[0]*xdims[1]; ++i)
@@ -150,8 +149,10 @@ void argmax(float *X, int xdims[2], int *Y) {
       int max_idx = 0;
       float max = X[i * xdims[1]];
       for (int j = 0; j < xdims[1]; ++j) {
-         if (X[i * xdims[1] + j] > max)
+         if (X[i * xdims[1] + j] > max) {
             max_idx = j;
+            max = X[i * xdims[1] + j];
+         }
       }
       Y[i] = max_idx;
    }
@@ -180,9 +181,10 @@ void forward_operation(float *x, float *conv1, float *conv2, float *fc1, float *
    float *d = (float *)calloc(ddims[0]* ddims[1] * ddims[2] * ddims[3], sizeof(float));
    average_pool(c, cdims, pool_size, d, ddims);
 
+   int ddims2[2] = { ddims[0], ddims[1]*ddims[2]*ddims[3]};
    int edims[2] = { ddims[0], fc1dims[1] };
    float *e = (float *)calloc(edims[0]* edims[1], sizeof(float));
-   fully_forward(d, ddims, fc1, fc1dims, e, edims);
+   fully_forward(d, ddims2, fc1, fc1dims, e, edims);
 
    relu2(e, edims);
 
@@ -204,8 +206,8 @@ int main() {
 
    // Load data into x and y
    float *x = (float *)malloc(BATCH_SIZE*NUM_ROWS*NUM_COLS*NUM_CHANNELS*sizeof(float));
-   float *r = (float *)malloc(BATCH_SIZE*NUM_DIGITS*sizeof(float));
-   loadData(x, r);
+   float *y = (float *)malloc(BATCH_SIZE*NUM_DIGITS*sizeof(float));
+   loadData(x, y);
 
    // Load model
    float *conv1 = (float *)malloc(5*5*1*32*sizeof(float));
@@ -218,17 +220,17 @@ int main() {
    forward_operation(x, conv1, conv2, fc1, fc2, out);
 
    int *ref = (int *)calloc(BATCH_SIZE, sizeof(int));
-   argmax(r, rdims, ref);
+   argmax(y, rdims, ref);
 
    int num_correct = 0;
    for (int i = 0; i < BATCH_SIZE; ++i) {
-      if (out[i] == r[i])
+      if (out[i] == ref[i])
          num_correct++;
    }
    printf("Done. Correctness: %f\n", (float)num_correct/BATCH_SIZE);
 
    free(x);
-   free(r);
+   free(y);
    free(conv1);
    free(conv2);
    free(fc1);
