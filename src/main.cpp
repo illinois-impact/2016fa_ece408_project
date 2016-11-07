@@ -1,10 +1,11 @@
 #include <algorithm>
+#include <cassert>
+#include <cstddef>
 #include <numeric>
 #include <valarray>
 
 #include <hdf5.h>
 #include <range.hpp>
-#include <cassert>
 
 using namespace util::lang;
 
