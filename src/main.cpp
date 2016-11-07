@@ -5,6 +5,7 @@
 #include <valarray>
 
 #include <hdf5.h>
+#include <fmt/format.h>
 #include <range.hpp>
 
 using namespace util::lang;
@@ -42,34 +43,32 @@ constexpr size_t array_size(const T (&)[N]) {
 }
 
 static void loadData(float *x, float *y) {
-  hid_t file_id, x_id, y_id; // identifiers
-  herr_t status;
-
   // Open the data file
-  file_id = H5Fopen(DATA, H5F_ACC_RDWR, H5P_DEFAULT);
+  const auto file_id = H5Fopen(DATA, H5F_ACC_RDWR, H5P_DEFAULT);
 
   // Open the dataset x and y
-  x_id = H5Dopen2(file_id, "/x", H5P_DEFAULT);
-  y_id = H5Dopen2(file_id, "/y", H5P_DEFAULT);
+  const auto x_id = H5Dopen2(file_id, "/x", H5P_DEFAULT);
+  const auto y_id = H5Dopen2(file_id, "/y", H5P_DEFAULT);
 
   // Get the dataset x dimensions
-  hid_t xspace      = H5Dget_space(x_id);
+  const auto xspace = H5Dget_space(x_id);
   const auto xndims = H5Sget_simple_extent_ndims(xspace); // 4
   assert(xndims == 4);
+
   hsize_t xdims[xndims];
   H5Sget_simple_extent_dims(xspace, xdims, NULL);
-  printf("xdims %d x %d x %d x %d\n", (int) (xdims[0]), (int) (xdims[1]), (int) (xdims[2]), (int) (xdims[3]));
+  fmt::print("xdims = {} x {} x {} x {}\n", xdims[0], xdims[1], xdims[2], xdims[3]);
 
   // Read the dataset x and y
   check_success(H5Dread(x_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, x));
   check_success(H5Dread(y_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, y));
 
   // Close the dataset x and y
-  status = H5Dclose(x_id);
-  status = H5Dclose(y_id);
+  check_success(H5Dclose(x_id));
+  check_success(H5Dclose(y_id));
 
   // Close the file
-  status = H5Fclose(file_id);
+  check_success(H5Fclose(file_id));
 }
 
 static void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {

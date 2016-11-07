@@ -46,6 +46,7 @@ Find_Package(EnableCxx11 REQUIRED)
 Find_Package(ZLIB CONFIG REQUIRED)
 Find_Package(szip CONFIG REQUIRED)
 Find_Package(hdf5 CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 Find_Package(Range REQUIRED)
 
 ### Configure sugar ###
@@ -71,6 +72,7 @@ target_include_directories(${PROJECT_TARGET}
 )
 target_link_libraries(${PROJECT_TARGET}
     PRIVATE hdf5
+    PRIVATE fmt
 )
 
 # sugar_status_print("${RANGE_INCLUDE_DIR}")
