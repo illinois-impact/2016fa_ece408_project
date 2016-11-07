@@ -13,15 +13,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include("cmake/modules/HunterGate.cmake")
 
-# 1. Try to detect hunter by:
-#   * cmake variable
-#   * environment variable
-#   * in HOME (`.hunter` directory)
-#   * in SYSTEMDRIVE (`.hunter` directory, windows only)
-#   * in USERPROFILE (`.hunter` directory, windows only)
-# 2. if failed, download it
-# 3. set HUNTER_GATE_* variables
-# 4. include master file: 'include(${HUNTER_SELF}/cmake/Hunter)
 HunterGate(
     URL "https://github.com/ruslo/hunter/archive/v0.15.1.tar.gz"
     SHA1 "3d8ede0d7937af3f1454330386028b7b8c5704d8"
