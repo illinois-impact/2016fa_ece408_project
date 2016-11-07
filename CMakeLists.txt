@@ -32,9 +32,14 @@ set(TOP_DIR "${PROJECT_SOURCE_DIR}")
 set(SRC_DIR "${TOP_DIR}/src")
 
 
+set(CONFIG_USE_SYSTEM_HDF5 "OFF" CACHE BOOL "Turn on to enable using the system HDF5 package")
+
 # now hunter can be used, like
 hunter_add_package(Sugar)
-hunter_add_package(hdf5)
+hunter_add_package(fmt)
+if (CONFIG_USE_SYSTEM_HDF5)
+    hunter_add_package(hdf5)
+endif (CONFIG_USE_SYSTEM_HDF5)
 
 ### Find dependencies ###
 Find_Package(EnableCxx11 REQUIRED)
