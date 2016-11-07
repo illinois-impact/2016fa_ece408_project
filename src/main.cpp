@@ -1,3 +1,7 @@
+#include <algorithm>
+#include <numeric>
+#include <valarray>
+
 #include <hdf5.h>
 #include <range.hpp>
 #include <cassert>
@@ -22,7 +26,7 @@ static int fc1dims[]   = {1024, 128};
 static int fc2dims[]   = {128, 10};
 
 template <typename T>
-bool check_success(const T &err);
+static bool check_success(const T &err);
 
 template <>
 bool check_success<herr_t>(const herr_t &err) {
@@ -36,7 +40,7 @@ constexpr size_t array_size(const T (&)[N]) {
   return N;
 }
 
-void loadData(float *x, float *y) {
+static void loadData(float *x, float *y) {
   hid_t file_id, x_id, y_id; // identifiers
   herr_t status;
 
@@ -67,7 +71,7 @@ void loadData(float *x, float *y) {
   status = H5Fclose(file_id);
 }
 
-void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
+static void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
 
   // Open the model file
   const auto file_id = H5Fopen(MODEL, H5F_ACC_RDWR, H5P_DEFAULT);
@@ -95,8 +99,8 @@ void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
 }
 
 // Convolution layer
-void conv_forward_valid(const float *X, const int xdims[4], const float *W, const int wdims[4], float *Y,
-                        const int ydims[4]) {
+static void conv_forward_valid(const float *X, const int xdims[4], const float *W, const int wdims[4], float *Y,
+                               const int ydims[4]) {
   const auto filter_h    = wdims[0];
   const auto filter_w    = wdims[1];
   const auto in_channel  = wdims[2];
@@ -122,20 +126,20 @@ void conv_forward_valid(const float *X, const int xdims[4], const float *W, cons
 }
 
 // Recified linear unit 4d
-void relu4(float *X, const int xdims[4]) {
+static void relu4(float *X, const int xdims[4]) {
   for (const auto i : range(0, xdims[0] * xdims[1] * xdims[2] * xdims[3])) {
     X[i] = (X[i] < 0) ? 0 : X[i];
   }
 }
 
 // Recified linear unit 2d
-void relu2(float *X, const int xdims[2]) {
+static void relu2(float *X, const int xdims[2]) {
   for (const auto i : range(0, xdims[0] * xdims[1])) {
     X[i] = (X[i] < 0) ? 0 : X[i];
   }
 }
 
-void average_pool(const float *X, const int xdims[4], const int pool_size, float *Y, const int ydims[4]) {
+static void average_pool(const float *X, const int xdims[4], const int pool_size, float *Y, const int ydims[4]) {
   int batch_size = xdims[0], H = xdims[1], W = xdims[2], M = xdims[3];
   int i, m, w, h, p, q;
 
@@ -151,7 +155,8 @@ void average_pool(const float *X, const int xdims[4], const int pool_size, float
                   (1.0 * pool_size * pool_size);
 }
 
-void fully_forward(const float *X, const int xdims[2], float *W, const int wdims[2], float *Y, const int ydims[2]) {
+static void fully_forward(const float *X, const int xdims[2], float *W, const int wdims[2], float *Y,
+                          const int ydims[2]) {
   int i, j, k;
   float sum;
 
@@ -166,62 +171,72 @@ void fully_forward(const float *X, const int xdims[2], float *W, const int wdims
   }
 }
 
-void argmax(const float *X, const int xdims[2], int *Y) {
-  for (int i = 0; i < xdims[0]; ++i) {
-    int max_idx = 0;
-    float max   = X[i * xdims[1]];
-    for (int j = 0; j < xdims[1]; ++j) {
-      if (X[i * xdims[1] + j] > max) {
+static void argmax(const float *X, const int xdims[2], int *Y) {
+  for (const auto i : range(0, xdims[0])) {
+    auto max_idx = 0;
+    auto max     = X[i * xdims[1]];
+    for (const auto j : range(0, xdims[1])) {
+      const auto elem = X[(i * xdims[1]) + j];
+      if (elem > max) {
         max_idx = j;
-        max     = X[i * xdims[1] + j];
+        max     = elem;
       }
     }
     Y[i] = max_idx;
   }
 }
 
+template <typename T, typename SzTy, size_t N>
+static T *zeros(const SzTy (&idims)[N]) {
+  const auto dims             = std::valarray<SzTy>(idims, N);
+  const auto flattened_length = std::accumulate(std::begin(dims), std::end(dims), 1, std::multiplies<SzTy>());
+  auto res                    = new T[flattened_length];
+  std::fill(res, res + N, static_cast<T>(0));
+  return res;
+}
+
 void forward_operation(float *x, float *conv1, float *conv2, float *fc1, float *fc2, int *out) {
 
   const int adims[] = {xdims[0], (xdims[1] - conv1dims[0] + 1), (xdims[2] - conv1dims[1] + 1), conv1dims[3]};
-  float *a          = (float *) calloc(adims[0] * adims[1] * adims[2] * adims[3], sizeof(float));
+  auto a            = zeros<float>(adims);
   conv_forward_valid(x, xdims, conv1, conv1dims, a, adims);
 
   relu4(a, adims);
 
   const int pool_size = 2;
   const int bdims[]   = {adims[0], adims[1] / pool_size, adims[2] / pool_size, adims[3]};
-  float *b            = (float *) calloc(bdims[0] * bdims[1] * bdims[2] * bdims[3], sizeof(float));
+  auto b              = zeros<float>(bdims);
   average_pool(a, adims, pool_size, b, bdims);
 
   const int cdims[] = {bdims[0], (bdims[1] - conv2dims[0] + 1), (bdims[2] - conv2dims[1] + 1), conv2dims[3]};
-  float *c          = (float *) calloc(cdims[0] * cdims[1] * cdims[2] * cdims[3], sizeof(float));
+  auto c            = zeros<float>(cdims);
   conv_forward_valid(b, bdims, conv2, conv2dims, c, cdims);
 
   relu4(c, cdims);
 
   const int ddims[] = {cdims[0], cdims[1] / pool_size, cdims[2] / pool_size, cdims[3]};
-  float *d          = (float *) calloc(ddims[0] * ddims[1] * ddims[2] * ddims[3], sizeof(float));
+  auto d            = zeros<float>(ddims);
   average_pool(c, cdims, pool_size, d, ddims);
 
   const int ddims2[] = {ddims[0], ddims[1] * ddims[2] * ddims[3]};
   const int edims[]  = {ddims[0], fc1dims[1]};
-  float *e           = (float *) calloc(edims[0] * edims[1], sizeof(float));
+  auto e             = zeros<float>(edims);
   fully_forward(d, ddims2, fc1, fc1dims, e, edims);
 
   relu2(e, edims);
 
   const int fdims[] = {edims[0], fc2dims[1]};
-  float *f          = (float *) calloc(fdims[0] * fdims[1], sizeof(float));
+  auto f            = zeros<float>(fdims);
   fully_forward(e, edims, fc2, fc2dims, f, fdims);
 
   argmax(f, fdims, out);
 
-  free(a);
-  free(b);
-  free(c);
-  free(d);
-  free(e);
-  free(f);
+  delete[] a;
+  delete[] b;
+  delete[] c;
+  delete[] d;
+  delete[] e;
+  delete[] f;
 }
 
 int main() {
