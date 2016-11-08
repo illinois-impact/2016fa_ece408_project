@@ -14,8 +14,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 include("cmake/modules/HunterGate.cmake")
 
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.15.1.tar.gz"
-    SHA1 "3d8ede0d7937af3f1454330386028b7b8c5704d8"
+    URL "https://github.com/ruslo/hunter/archive/v0.16.24.tar.gz"
+    SHA1 "00ab627d3d4fe5151e15b6ab2b1b1da17650984a"
 )
 
 project(ECE408Project)
@@ -38,12 +38,14 @@ set(CONFIG_USE_SYSTEM_HDF5 "OFF" CACHE BOOL "Turn on to enable using the system 
 hunter_add_package(Sugar)
 hunter_add_package(fmt)
 if (CONFIG_USE_SYSTEM_HDF5)
-    hunter_add_package(hdf5)
+  hunter_add_package(hdf5)
+  hunter_add_package(ZLIB)
+  hunter_add_package(szip)
 endif (CONFIG_USE_SYSTEM_HDF5)
 
 ### Find dependencies ###
 Find_Package(EnableCxx11 REQUIRED)
-Find_Package(ZLIB CONFIG REQUIRED)
+Find_Package(ZLIB REQUIRED)
 Find_Package(szip CONFIG REQUIRED)
 Find_Package(hdf5 CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
