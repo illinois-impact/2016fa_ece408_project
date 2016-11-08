@@ -13,6 +13,10 @@ static bool check_success(const T &err);
 template <>
 bool check_success<herr_t>(const herr_t &err) {
   const auto res = err >= static_cast<herr_t>(0);
+  if (res == true) {
+    return res;
+  }
+  std::cout << "Failed in HDFS..." << std::endl;
   assert(res);
   return res;
 }
@@ -23,10 +27,17 @@ constexpr size_t array_size(const T (&)[N]) {
 }
 
 template <typename T, typename SzTy, size_t N>
+static T *allocate(const SzTy (&idims)[N]) {
+  const auto dims         = std::valarray<SzTy>(idims, N);
+  size_t flattened_length = std::accumulate(std::begin(dims), std::end(dims), 1,
+                                            std::multiplies<SzTy>());
+  T *res = new T[flattened_length];
+  return res;
+}
+
+template <typename T, typename SzTy, size_t N>
 static T *zeros(const SzTy (&idims)[N]) {
-  const auto dims             = std::valarray<SzTy>(idims, N);
-  const auto flattened_length = std::accumulate(std::begin(dims), std::end(dims), 1, std::multiplies<SzTy>());
-  auto res                    = new T[flattened_length];
+  T *res = allocate<T, SzTy, N>(idims);
   std::fill(res, res + N, static_cast<T>(0));
   return res;
 }

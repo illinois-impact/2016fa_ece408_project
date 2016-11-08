@@ -1,6 +1,7 @@
 
 cmake_minimum_required(VERSION 3.0)
 
+cmake_policy(SET CMP0007 OLD)
 cmake_policy(SET CMP0054 OLD)
 if (POLICY CMP0025)
     cmake_policy(SET CMP0025 OLD) # report Apple's Clang as just Clang
@@ -35,8 +36,6 @@ set(CONFIG_USE_SYSTEM_HDF5 "OFF" CACHE BOOL "Turn on to enable using the system 
 
 # now hunter can be used, like
 hunter_add_package(Sugar)
-hunter_add_package(fmt)
-hunter_add_package(gflags)
 if (NOT CONFIG_USE_SYSTEM_HDF5)
   hunter_add_package(ZLIB)
   hunter_add_package(hdf5)
@@ -48,10 +47,8 @@ Find_Package(EnableCxx11 REQUIRED)
 Find_Package(ZLIB REQUIRED)
 Find_Package(szip REQUIRED)
 Find_Package(hdf5 REQUIRED)
-Find_Package(fmt REQUIRED)
 Find_Package(Range REQUIRED)
 Find_Package(CUDA REQUIRED)
-Find_package(gflags REQUIRED)
 
 set(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE OFF)
 set(CUDA_USE_STATIC_CUDA_RUNTIME ON)
@@ -84,7 +81,7 @@ list(APPEND CUDA_NVCC_FLAGS ${ARCH_FLAGS})
 
 # Set warning levels for host compilation
 if (UNIX)
-
+    add_compile_options(-Wextra)
     add_compile_options(-Wno-unused-function)
     add_compile_options(-Wno-unused-parameter)
     add_compile_options(-Wno-unused-parameter)
@@ -111,9 +108,7 @@ set(PROJECT_TARGET ece408)
 cuda_add_executable(${PROJECT_TARGET} ${SOURCES})
 add_dependencies(${PROJECT_TARGET} range)
 target_link_libraries(${PROJECT_TARGET}
-    gflags-static
     hdf5
-    fmt
     ${ZLIB_LIBRARIES}
 )
 
