@@ -46,9 +46,9 @@ endif (CONFIG_USE_SYSTEM_HDF5)
 ### Find dependencies ###
 Find_Package(EnableCxx11 REQUIRED)
 Find_Package(ZLIB REQUIRED)
-Find_Package(szip CONFIG REQUIRED)
-Find_Package(hdf5 CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
+Find_Package(szip REQUIRED)
+Find_Package(hdf5 REQUIRED)
+find_package(fmt REQUIRED)
 Find_Package(Range REQUIRED)
 
 ### Configure sugar ###
