@@ -84,9 +84,10 @@ list(APPEND CUDA_NVCC_FLAGS ${ARCH_FLAGS})
 
 # Set warning levels for host compilation
 if (UNIX)
+
     add_compile_options(-Wno-unused-function)
     add_compile_options(-Wno-unused-parameter)
-    add_compile_options(-Wextra)
+    add_compile_options(-Wno-unused-parameter)
     add_compile_options(-Wno-vla)
     add_compile_options(-Wno-unused-variable)
 endif (UNIX)

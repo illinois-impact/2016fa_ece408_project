@@ -4,19 +4,19 @@
 #include <iostream>
 #include <numeric>
 #include <valarray>
+#include <gflags/gflags.h>
 
 #include <fmt/format.h>
-#include <gflags/gflags.h>
 #include <hdf5.h>
 #include <range.hpp>
 
 #include "utils.hpp"
 
-using namespace gflags;
 using namespace util::lang;
 
 #define DEFAULT_DATA_PATH "../data/data.hdf5"
 #define DEFAULT_MODEL_PATH "../data/model.hdf5"
+
 
 #define BATCH_SIZE 10000
 #define NUM_ROWS 28
@@ -24,16 +24,22 @@ using namespace util::lang;
 #define NUM_CHANNELS 1
 #define NUM_DIGITS 10
 
+DECLARE_string(data);
+DECLARE_string(model);
+
+DEFINE_string(data, "", "path to the hdf5 data file");
+DEFINE_string(model, "", "path to the hdf5 model file");
+
+// Data and reference data dimensions
 static int xdims[] = {BATCH_SIZE, NUM_ROWS, NUM_COLS, NUM_CHANNELS};
 static int rdims[] = {BATCH_SIZE, NUM_DIGITS};
 
+// Model dimensions 
 static int conv1dims[] = {5, 5, 1, 32};
 static int conv2dims[] = {5, 5, 32, 64};
 static int fc1dims[]   = {1024, 128};
 static int fc2dims[]   = {128, 10};
 
-DEFINE_string(data, "", "path to the hdf5 data file");
-DEFINE_string(model, "", "path to the hdf5 model file");
 
 static void loadData(float *x, float *y) {
   // Open the data file
@@ -45,7 +51,7 @@ static void loadData(float *x, float *y) {
 
   // Get the dataset x dimensions
   const auto xspace = H5Dget_space(x_id);
-  const auto xndims = H5Sget_simple_extent_ndims(xspace); // 4
+  const auto xndims = H5Sget_simple_extent_ndims(xspace);
   assert(xndims == 4);
 
   hsize_t xdims[xndims];
@@ -92,12 +98,10 @@ static void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
 }
 
 // Convolution layer
-static void conv_forward_valid(const float *X, const int xdims[4], const float *W, const int wdims[4], float *Y,
-                               const int ydims[4]) {
+static void conv_forward_valid(const float *X, const int xdims[4], const float *W, const int wdims[4], float *Y, const int ydims[4]) {
   const auto filter_h    = wdims[0];
   const auto filter_w    = wdims[1];
   const auto in_channel  = wdims[2];
-  const auto out_channel = wdims[3];
 
   for (const auto i : range(0, ydims[0])) {
     for (const auto m : range(0, ydims[3])) {
@@ -133,26 +137,19 @@ static void relu2(float *X, const int xdims[2]) {
 }
 
 static void average_pool(const float *X, const int xdims[4], const int pool_size, float *Y, const int ydims[4]) {
-  int batch_size = xdims[0];
-  int H unused   = xdims[1];
-  int W unused   = xdims[2];
-  int M unused   = xdims[3];
-  int i, m, w, h, p, q;
 
-  for (i = 0; i < ydims[0]; ++i)
-    for (m = 0; m < ydims[3]; ++m)
-      for (w = 0; w < ydims[2]; ++w)
-        for (h = 0; h < ydims[1]; ++h)
-          for (p = 0; p < pool_size; ++p)
-            for (q = 0; q < pool_size; ++q)
-              Y[i * ydims[1] * ydims[2] * ydims[3] + h * ydims[2] * ydims[3] + w * ydims[3] + m] +=
-                  X[i * xdims[1] * xdims[2] * xdims[3] + (pool_size * h + p) * xdims[2] * xdims[3] +
-                    (pool_size * w + q) * xdims[3] + m] /
-                  (1.0f * pool_size * pool_size);
+  for (const auto i : range(0, ydims[0]))
+    for (const auto m : range(0, ydims[3]))
+      for (const auto w : range(0, ydims[2]))
+        for (const auto h : range(0, ydims[1]))
+          for (const auto p : range(0, pool_size))
+            for (const auto q : range(0, pool_size))
+              Y[((i * ydims[1] + h) * ydims[2] + w) * ydims[3] + m] +=
+                  X[i * xdims[1] * xdims[2] * xdims[3] + (pool_size * h + p) * xdims[2] * xdims[3] + (pool_size * w + q) * xdims[3] + m]
+                  / (1.0f * pool_size * pool_size);
 }
 
-static void fully_forward(const float *X, const int xdims[2], float *W, const int wdims[2], float *Y,
-                          const int ydims[2]) {
+static void fully_forward(const float *X, const int xdims[2], float *W, const int wdims[2], float *Y, const int ydims[2]) {
   int i, j, k;
   float sum;
 
@@ -227,11 +224,11 @@ void forward_operation(float *x, float *conv1, float *conv2, float *fc1, float *
 }
 
 int main(int argc, char **argv) {
-  std::string usage = fmt::format("This program jfdklsklfd.  Sample usage: {} -data [{}] -model [{}]\n", argv[0],
-                                  DEFAULT_DATA_PATH, DEFAULT_MODEL_PATH);
+  std::string usage = fmt::format("\nThis program.  Sample usage: {} -data [{}] -model [{}]\n", argv[0], DEFAULT_DATA_PATH, DEFAULT_MODEL_PATH);
+  
   google::SetUsageMessage(usage);
-
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  
+  google::ParseCommandLineFlags(&argc, &argv, true);
 
   if (FLAGS_data == "" || FLAGS_model == "") {
     std::cerr << usage << "\n";
@@ -261,7 +258,7 @@ int main(int argc, char **argv) {
     if (out[i] == ref[i])
       num_correct++;
   }
-  printf("Done. Correctness: %f\n", (float) num_correct / BATCH_SIZE);
+  fmt::printf("Done. Correctness: %f\n", (float) num_correct / BATCH_SIZE);
 
   free(x);
   free(y);
