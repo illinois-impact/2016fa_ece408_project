@@ -15,5 +15,6 @@ include(sugar_include)
 
 sugar_files(
     SOURCES
-    main.cpp
+    main.cu
+    utils.hpp
 )

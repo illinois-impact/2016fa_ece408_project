@@ -1,17 +1,22 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <iostream>
 #include <numeric>
 #include <valarray>
 
-#include <hdf5.h>
 #include <fmt/format.h>
+#include <gflags/gflags.h>
+#include <hdf5.h>
 #include <range.hpp>
 
+#include "utils.hpp"
+
+using namespace gflags;
 using namespace util::lang;
 
-#define DATA "../data/data.hdf5"
-#define MODEL "../data/model.hdf5"
+#define DEFAULT_DATA_PATH "../data/data.hdf5"
+#define DEFAULT_MODEL_PATH "../data/model.hdf5"
 
 #define BATCH_SIZE 10000
 #define NUM_ROWS 28
@@ -27,24 +32,12 @@ static int conv2dims[] = {5, 5, 32, 64};
 static int fc1dims[]   = {1024, 128};
 static int fc2dims[]   = {128, 10};
 
-template <typename T>
-static bool check_success(const T &err);
-
-template <>
-bool check_success<herr_t>(const herr_t &err) {
-  const auto res = err >= static_cast<herr_t>(0);
-  assert(res);
-  return res;
-}
-
-template <typename T, size_t N>
-constexpr size_t array_size(const T (&)[N]) {
-  return N;
-}
+DEFINE_string(data, "", "path to the hdf5 data file");
+DEFINE_string(model, "", "path to the hdf5 model file");
 
 static void loadData(float *x, float *y) {
   // Open the data file
-  const auto file_id = H5Fopen(DATA, H5F_ACC_RDWR, H5P_DEFAULT);
+  const auto file_id = H5Fopen(FLAGS_data.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   // Open the dataset x and y
   const auto x_id = H5Dopen2(file_id, "/x", H5P_DEFAULT);
@@ -74,7 +67,7 @@ static void loadData(float *x, float *y) {
 static void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
 
   // Open the model file
-  const auto file_id = H5Fopen(MODEL, H5F_ACC_RDWR, H5P_DEFAULT);
+  const auto file_id = H5Fopen(FLAGS_model.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   // Open the dataset
   const auto conv1_id = H5Dopen2(file_id, "/conv1", H5P_DEFAULT);
@@ -140,7 +133,10 @@ static void relu2(float *X, const int xdims[2]) {
 }
 
 static void average_pool(const float *X, const int xdims[4], const int pool_size, float *Y, const int ydims[4]) {
-  int batch_size = xdims[0], H = xdims[1], W = xdims[2], M = xdims[3];
+  int batch_size = xdims[0];
+  int H unused   = xdims[1];
+  int W unused   = xdims[2];
+  int M unused   = xdims[3];
   int i, m, w, h, p, q;
 
   for (i = 0; i < ydims[0]; ++i)
@@ -152,7 +148,7 @@ static void average_pool(const float *X, const int xdims[4], const int pool_size
               Y[i * ydims[1] * ydims[2] * ydims[3] + h * ydims[2] * ydims[3] + w * ydims[3] + m] +=
                   X[i * xdims[1] * xdims[2] * xdims[3] + (pool_size * h + p) * xdims[2] * xdims[3] +
                     (pool_size * w + q) * xdims[3] + m] /
-                  (1.0 * pool_size * pool_size);
+                  (1.0f * pool_size * pool_size);
 }
 
 static void fully_forward(const float *X, const int xdims[2], float *W, const int wdims[2], float *Y,
@@ -184,15 +180,6 @@ static void argmax(const float *X, const int xdims[2], int *Y) {
     }
     Y[i] = max_idx;
   }
-}
-
-template <typename T, typename SzTy, size_t N>
-static T *zeros(const SzTy (&idims)[N]) {
-  const auto dims             = std::valarray<SzTy>(idims, N);
-  const auto flattened_length = std::accumulate(std::begin(dims), std::end(dims), 1, std::multiplies<SzTy>());
-  auto res                    = new T[flattened_length];
-  std::fill(res, res + N, static_cast<T>(0));
-  return res;
 }
 
 void forward_operation(float *x, float *conv1, float *conv2, float *fc1, float *fc2, int *out) {
@@ -239,7 +226,17 @@ void forward_operation(float *x, float *conv1, float *conv2, float *fc1, float *
   delete[] f;
 }
 
-int main() {
+int main(int argc, char **argv) {
+  std::string usage = fmt::format("This program jfdklsklfd.  Sample usage: {} -data [{}] -model [{}]\n", argv[0],
+                                  DEFAULT_DATA_PATH, DEFAULT_MODEL_PATH);
+  google::SetUsageMessage(usage);
+
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+
+  if (FLAGS_data == "" || FLAGS_model == "") {
+    std::cerr << usage << "\n";
+    return -1;
+  }
 
   // Load data into x and y
   float *x = (float *) malloc(BATCH_SIZE * NUM_ROWS * NUM_COLS * NUM_CHANNELS * sizeof(float));

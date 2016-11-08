@@ -31,13 +31,12 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 set(TOP_DIR "${PROJECT_SOURCE_DIR}")
 set(SRC_DIR "${TOP_DIR}/src")
 
-message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
-
 set(CONFIG_USE_SYSTEM_HDF5 "OFF" CACHE BOOL "Turn on to enable using the system HDF5 package")
 
 # now hunter can be used, like
 hunter_add_package(Sugar)
 hunter_add_package(fmt)
+hunter_add_package(gflags)
 if (NOT CONFIG_USE_SYSTEM_HDF5)
   hunter_add_package(ZLIB)
   hunter_add_package(hdf5)
@@ -46,11 +45,17 @@ endif (NOT CONFIG_USE_SYSTEM_HDF5)
 
 ### Find dependencies ###
 Find_Package(EnableCxx11 REQUIRED)
-Find_Package(ZLIB REQUIRED CONFIG)
-Find_Package(szip REQUIRED CONFIG)
-Find_Package(hdf5 REQUIRED CONFIG)
-find_package(fmt REQUIRED CONFIG)
+Find_Package(ZLIB REQUIRED)
+Find_Package(szip REQUIRED)
+Find_Package(hdf5 REQUIRED)
+Find_Package(fmt REQUIRED)
 Find_Package(Range REQUIRED)
+Find_Package(CUDA REQUIRED)
+Find_package(gflags REQUIRED)
+
+set(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE OFF)
+set(CUDA_USE_STATIC_CUDA_RUNTIME ON)
+set(CUDA_VERBOSE_BUILD OFF)
 
 ### Configure sugar ###
 
@@ -67,17 +72,51 @@ sugar_groups_generate(${SOURCES})
 
 ### Setup target ###
 
-set(PROJECT_TARGET ece408)
-add_executable(${PROJECT_TARGET} ${SOURCES})
-add_dependencies(${PROJECT_TARGET} range)
-target_include_directories(${PROJECT_TARGET}
-    PRIVATE "${RANGE_INCLUDE_DIR}"
-    PRIVATE "${ZLIB_INCLUDE_DIRS}"
+set(CUDA_PROPAGATE_HOST_FLAGS TRUE)
+
+# It may be necessary to specify the compute capability of your
+# NVIDIA GPU. In that case, simply uncomment the following two lines that start
+# with 'set' and change the value of COMPUTE_CAPABILITY to one of the following
+# hardware architectures: Tesla-class '11', '12', or '13'; Fermi-class '20'
+# or '21'; Kepler-class '30', '32', '35'; or Maxwell-class '50' or '52'
+CUDA_SELECT_NVCC_ARCH_FLAGS(ARCH_FLAGS 3.0 3.5+PTX 5.0 Maxwell 6.1)
+list(APPEND CUDA_NVCC_FLAGS ${ARCH_FLAGS})
+
+# Set warning levels for host compilation
+if (UNIX)
+    add_compile_options(-Wno-unused-function)
+    add_compile_options(-Wno-unused-parameter)
+    add_compile_options(-Wextra)
+    add_compile_options(-Wno-vla)
+    add_compile_options(-Wno-unused-variable)
+endif (UNIX)
+
+# Add debugging to CUDA NVCC flags (for NVidia's NSight tools)
+set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} "-G")
+
+################################
+################################
+
+include_directories(
+    "${RANGE_INCLUDE_DIR}"
+    "${ZLIB_INCLUDE_DIRS}"
+    "${HDF5_INCLUDE_DIR}"
+    "${SRC_DIR}"
 )
+
+sugar_status_print("HDF5_INCLUDE_DIRS = ${HDF5_INCLUDE_DIR}")
+
+set(PROJECT_TARGET ece408)
+cuda_add_executable(${PROJECT_TARGET} ${SOURCES})
+add_dependencies(${PROJECT_TARGET} range)
 target_link_libraries(${PROJECT_TARGET}
-    PRIVATE hdf5
-    PRIVATE fmt
-    PRIVATE ${ZLIB_LIBRARIES}
+    gflags-static
+    hdf5
+    fmt
+    ${ZLIB_LIBRARIES}
 )
 
 # sugar_status_print("${RANGE_INCLUDE_DIR}")
+
+# Add a special target to clean nvcc generated files.
+CUDA_BUILD_CLEAN_TARGET()
