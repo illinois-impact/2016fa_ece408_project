@@ -42,7 +42,7 @@ if (NOT CONFIG_USE_SYSTEM_HDF5)
   hunter_add_package(ZLIB)
   hunter_add_package(hdf5)
   hunter_add_package(szip)
-endif (CONFIG_USE_SYSTEM_HDF5)
+endif (NOT CONFIG_USE_SYSTEM_HDF5)
 
 ### Find dependencies ###
 Find_Package(EnableCxx11 REQUIRED)
