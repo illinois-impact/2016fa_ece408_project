@@ -295,9 +295,8 @@ int main(int argc, char **argv) {
   forward_operation(x, conv1, conv2, fc1, fc2, out);
 
   gettimeofday(&end, NULL);
-  float elapsed  = (end.tv_sec + end.tv_usec/1000000.0f) - (start.tv_sec + start.tv_usec/1000000.0f);
+  double elapsed  = (end.tv_sec*1000000 + end.tv_usec) - (start.tv_sec*1000000 + start.tv_usec);
 
-  printf("%f\n", elapsed);
   // Get reference
   int *ref = zeros<int>(FLAGS_batch_size);
   argmax(y, rdims, ref);
@@ -309,7 +308,7 @@ int main(int argc, char **argv) {
       num_correct++;
     }
   }
-  std::cout << "Done with " << FLAGS_batch_size << " queries in " << elapsed << "s. Correctness: "
+  std::cout << "Done with " << FLAGS_batch_size << " queries in " << elapsed/1000000.0f << "s. Correctness: "
             << static_cast<float>(num_correct) / FLAGS_batch_size << "\n";
 
   delete[] x;
