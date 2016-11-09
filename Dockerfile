@@ -11,6 +11,7 @@ LABEL com.webgpu.project.ece408.version="0.0.1"
 COPY . ${SRCDIR}
 COPY ./data ${DATADIR}
 
+RUN chown -R ${USERNAME} ${HOME}
 RUN find ${HOME} -type f -exec touch {} +
 
 WORKDIR ${BUILDDIR}
