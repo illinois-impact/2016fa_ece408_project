@@ -110,7 +110,5 @@ target_link_libraries(${PROJECT_TARGET}
     ${ZLIB_LIBRARIES}
 )
 
-# sugar_status_print("${RANGE_INCLUDE_DIR}")
-
 # Add a special target to clean nvcc generated files.
 CUDA_BUILD_CLEAN_TARGET()
