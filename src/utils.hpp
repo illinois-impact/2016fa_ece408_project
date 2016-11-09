@@ -28,18 +28,42 @@ constexpr size_t array_size(const T (&)[N]) {
   return N;
 }
 
-template <typename T, typename SzTy, size_t N>
-static T *allocate(const SzTy (&idims)[N]) {
-  const auto dims         = std::valarray<SzTy>(idims, N);
-  size_t flattened_length = std::accumulate(std::begin(dims), std::end(dims), 1,
-                                            std::multiplies<SzTy>());
-  T *res = new T[flattened_length];
+template <typename SzTy, size_t N>
+static size_t flattened_length(const SzTy (&idims)[N]) {
+  const auto dims = std::valarray<SzTy>(idims, N);
+  size_t len      = std::accumulate(std::begin(dims), std::end(dims), 1,
+                               std::multiplies<SzTy>());
+  return len;
+}
+
+template <typename SzTy>
+static size_t flattened_length(const SzTy n) {
+  return static_cast<size_t>(n);
+}
+
+template <typename T, typename SzTy>
+static T *allocate(const SzTy len) {
+  T *res = new T[len];
   return res;
 }
 
 template <typename T, typename SzTy, size_t N>
-static T *zeros(const SzTy (&idims)[N]) {
-  T *res = allocate<T, SzTy, N>(idims);
+static T *allocate(const SzTy (&dims)[N]) {
+  const auto len = flattened_length(dims);
+  return allocate<T>(len);
+}
+
+template <typename T, typename SzTy>
+static T *zeros(const SzTy len) {
+  T *res = allocate<T, SzTy>(len);
+  std::fill(res, res + len, static_cast<T>(0));
+  return res;
+}
+
+template <typename T, typename SzTy, size_t N>
+static T *zeros(const SzTy (&dims)[N]) {
+  const auto len = flattened_length(dims);
+  T *res         = allocate<T, SzTy>(len);
   std::fill(res, res + N, static_cast<T>(0));
   return res;
 }

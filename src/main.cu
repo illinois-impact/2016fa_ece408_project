@@ -256,24 +256,27 @@ void forward_operation(float *x, float *conv1, float *conv2, float *fc1,
 }
 
 int main(int argc, char **argv) {
-  std::string usage = std::string("\nThis program does the forared opertion "
-                                  "for the CNN.  Sample usage: ") +
-                      std::string(argv[0]) + "[" + DEFAULT_DATA_PATH + "] [" +
-                      DEFAULT_MODEL_PATH + "]";
 
   if (argc != 3 && argc != 4) {
-    std::cerr << usage << "\n";
+    std::cerr << "\n"
+              << "This program does the forared opertion for the CNN.  "
+                 "Sample usage: "
+              << argv[0] << "[" << DEFAULT_DATA_PATH << "] "
+              << "[" << DEFAULT_MODEL_PATH << "]"
+              << "\n";
     return -1;
   }
   FLAGS_data  = std::string(argv[1]);
   FLAGS_model = std::string(argv[2]);
   if (argc == 4) {
     FLAGS_batch_size = atoi(argv[3]);
+    xdims[0]         = FLAGS_batch_size;
+    rdims[0]         = FLAGS_batch_size;
   }
 
   // Load data into x and y
   float *x = allocate<float>(xdims);
-  float *y = allocate<float>(ydims);
+  float *y = allocate<float>(rdims);
   loadData(x, y);
 
   // Load model
