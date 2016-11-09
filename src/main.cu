@@ -8,8 +8,7 @@
 #include <hdf5.h>
 
 #include "utils.hpp"
-
-using namespace util::lang;
+#include "range.hpp"
 
 #define NUM_ROWS 28
 #define NUM_COLS 28
