@@ -3,13 +3,13 @@
 #include <cstddef>
 #include <iostream>
 #include <numeric>
-#include <valarray>
 #include <sys/time.h>
+#include <valarray>
 
 #include <hdf5.h>
 
-#include "utils.hpp"
 #include "range.hpp"
+#include "utils.hpp"
 
 #define NUM_ROWS 28
 #define NUM_COLS 28
@@ -285,7 +285,6 @@ int main(int argc, char **argv) {
   float *fc2   = allocate<float>(fc2dims);
   loadModel(conv1, conv2, fc1, fc2);
 
-
   // Perform foward opertion
   int *out = zeros<int>(FLAGS_batch_size);
 
@@ -295,7 +294,8 @@ int main(int argc, char **argv) {
   forward_operation(x, conv1, conv2, fc1, fc2, out);
 
   gettimeofday(&end, NULL);
-  double elapsed  = (end.tv_sec*1000000 + end.tv_usec) - (start.tv_sec*1000000 + start.tv_usec);
+  double elapsed = (end.tv_sec * 1000000 + end.tv_usec) -
+                   (start.tv_sec * 1000000 + start.tv_usec);
 
   // Get reference
   int *ref = zeros<int>(FLAGS_batch_size);
@@ -308,7 +308,8 @@ int main(int argc, char **argv) {
       num_correct++;
     }
   }
-  std::cout << "Done with " << FLAGS_batch_size << " queries in " << elapsed/1000000.0f << "s. Correctness: "
+  std::cout << "Done with " << FLAGS_batch_size << " queries in "
+            << elapsed / 1000000.0f << "s. Correctness: "
             << static_cast<float>(num_correct) / FLAGS_batch_size << "\n";
 
   delete[] x;
