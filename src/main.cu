@@ -66,7 +66,6 @@ static void loadData(float *x, float *y) {
 }
 
 static void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
-
   // Open the model file
   const auto file_id = H5Fopen(FLAGS_model.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
@@ -96,7 +95,7 @@ static void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
   check_success(H5Fclose(file_id));
 }
 
-// Convolution layer
+// From book chapter Figure 16.4
 static void conv_forward_valid(const float *X, const int xdims[4],
                                const float *W, const int wdims[4], float *Y,
                                const int ydims[4]) {
@@ -142,20 +141,21 @@ static void relu2(float *X, const int xdims[2]) {
   }
 }
 
+// From book chapter Figure 16.5
 static void average_pool(const float *X, const int xdims[4],
                          const int pool_size, float *Y, const int ydims[4]) {
-
   for (const auto i : range(0, ydims[0])) {
     for (const auto m : range(0, ydims[3])) {
       for (const auto w : range(0, ydims[2])) {
         for (const auto h : range(0, ydims[1])) {
           for (const auto p : range(0, pool_size)) {
             for (const auto q : range(0, pool_size)) {
-              Y[((i * ydims[1] + h) * ydims[2] + w) * ydims[3] + m] +=
-                  X[i * xdims[1] * xdims[2] * xdims[3] +
-                    (pool_size * h + p) * xdims[2] * xdims[3] +
-                    (pool_size * w + q) * xdims[3] + m] /
-                  (1.0f * pool_size * pool_size);
+              const auto yoffset =
+                  ((i * ydims[1] + h) * ydims[2] + w) * ydims[3] + m;
+              const auto xoffset = i * xdims[1] * xdims[2] * xdims[3] +
+                                   (pool_size * h + p) * xdims[2] * xdims[3] +
+                                   (pool_size * w + q) * xdims[3] + m;
+              Y[yoffset] += X[xoffset] / (1.0f * pool_size * pool_size);
             }
           }
         }
@@ -166,13 +166,11 @@ static void average_pool(const float *X, const int xdims[4],
 
 static void fully_forward(const float *X, const int xdims[2], float *W,
                           const int wdims[2], float *Y, const int ydims[2]) {
-  int i, j, k;
   float sum;
-
-  for (i = 0; i < xdims[0]; ++i) {
-    for (j = 0; j < wdims[1]; ++j) {
+  for (const auto i : range(0, xdims[0])) {
+    for (const auto j : range(0, wdims[1])) {
       sum = 0;
-      for (k = 0; k < xdims[1]; ++k) {
+      for (const auto k : range(0, xdims[1])) {
         sum += X[i * xdims[1] + k] * W[k * wdims[1] + j];
       }
       Y[i * wdims[1] + j] = sum;
@@ -180,6 +178,7 @@ static void fully_forward(const float *X, const int xdims[2], float *W,
   }
 }
 
+// Choose the guess with largest score
 static void argmax(const float *X, const int xdims[2], int *Y) {
   for (const auto i : range(0, xdims[0])) {
     auto max_idx = 0;
@@ -195,41 +194,53 @@ static void argmax(const float *X, const int xdims[2], int *Y) {
   }
 }
 
+// Forward operation for the CNN, a combination of conv layer + average pooling
+// + relu
 void forward_operation(float *x, float *conv1, float *conv2, float *fc1,
                        float *fc2, int *out) {
-
+  // conv layer
   const int adims[] = {xdims[0], (xdims[1] - conv1dims[0] + 1),
                        (xdims[2] - conv1dims[1] + 1), conv1dims[3]};
   auto a = zeros<float>(adims);
   conv_forward_valid(x, xdims, conv1, conv1dims, a, adims);
 
+  /// relu layer
   relu4(a, adims);
 
+  // average pooling
   const int pool_size = 2;
   const int bdims[]   = {adims[0], adims[1] / pool_size, adims[2] / pool_size,
                        adims[3]};
   auto b = zeros<float>(bdims);
   average_pool(a, adims, pool_size, b, bdims);
 
+  // conv layer
   const int cdims[] = {bdims[0], (bdims[1] - conv2dims[0] + 1),
                        (bdims[2] - conv2dims[1] + 1), conv2dims[3]};
   auto c = zeros<float>(cdims);
   conv_forward_valid(b, bdims, conv2, conv2dims, c, cdims);
 
+  // relu
   relu4(c, cdims);
 
+  // average pooling
   const int ddims[] = {cdims[0], cdims[1] / pool_size, cdims[2] / pool_size,
                        cdims[3]};
   auto d = zeros<float>(ddims);
   average_pool(c, cdims, pool_size, d, ddims);
 
+  // reshape
   const int ddims2[] = {ddims[0], ddims[1] * ddims[2] * ddims[3]};
-  const int edims[]  = {ddims[0], fc1dims[1]};
-  auto e             = zeros<float>(edims);
+
+  // matrix multiplication
+  const int edims[] = {ddims[0], fc1dims[1]};
+  auto e            = zeros<float>(edims);
   fully_forward(d, ddims2, fc1, fc1dims, e, edims);
 
+  // relu
   relu2(e, edims);
 
+  // matrix multiplication
   const int fdims[] = {edims[0], fc2dims[1]};
   auto f            = zeros<float>(fdims);
   fully_forward(e, edims, fc2, fc2dims, f, fdims);
@@ -245,7 +256,8 @@ void forward_operation(float *x, float *conv1, float *conv2, float *fc1,
 }
 
 int main(int argc, char **argv) {
-  std::string usage = std::string("\nThis program.  Sample usage: ") +
+  std::string usage = std::string("\nThis program does the forared opertion "
+                                  "for the CNN.  Sample usage: ") +
                       std::string(argv[0]) + "[" + DEFAULT_DATA_PATH + "] [" +
                       DEFAULT_MODEL_PATH + "]";
 
@@ -260,24 +272,26 @@ int main(int argc, char **argv) {
   }
 
   // Load data into x and y
-  float *x = (float *) malloc(FLAGS_batch_size * NUM_ROWS * NUM_COLS *
-                              NUM_CHANNELS * sizeof(float));
-  float *y = (float *) malloc(FLAGS_batch_size * NUM_DIGITS * sizeof(float));
+  float *x = allocate<float>(xdims);
+  float *y = allocate<float>(ydims);
   loadData(x, y);
 
   // Load model
   float *conv1 = allocate<float>(conv1dims);
-  float *conv2 = (float *) malloc(5 * 5 * 32 * 64 * sizeof(float));
-  float *fc1   = (float *) malloc(1024 * 128 * sizeof(float));
-  float *fc2   = (float *) malloc(128 * 10 * sizeof(float));
+  float *conv2 = allocate<float>(conv2dims);
+  float *fc1   = allocate<float>(fc1dims);
+  float *fc2   = allocate<float>(fc2dims);
   loadModel(conv1, conv2, fc1, fc2);
 
-  int *out = (int *) calloc(FLAGS_batch_size, sizeof(int));
+  // Perform foward opertion
+  int *out = zeros<int>(FLAGS_batch_size);
   forward_operation(x, conv1, conv2, fc1, fc2, out);
 
-  int *ref = (int *) calloc(FLAGS_batch_size, sizeof(int));
+  // Get reference
+  int *ref = zeros<int>(FLAGS_batch_size);
   argmax(y, rdims, ref);
 
+  // Calculate correctness
   int num_correct = 0;
   for (int i = 0; i < FLAGS_batch_size; ++i) {
     if (out[i] == ref[i])
@@ -286,13 +300,14 @@ int main(int argc, char **argv) {
   std::cout << "Done. Correctness: "
             << static_cast<float>(num_correct) / FLAGS_batch_size << "\n";
 
-  free(x);
-  free(y);
+  delete[] x;
+  delete[] y;
   delete[] conv1;
-  free(conv2);
-  free(fc1);
-  free(fc2);
-  free(out);
+  delete[] conv2;
+  delete[] fc1;
+  delete[] fc2;
+  delete[] out;
+  delete[] ref;
 
   return 0;
 }
