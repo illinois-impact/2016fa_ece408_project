@@ -72,7 +72,7 @@ an optional `batch_size` can be specified
 
 ## How to test 
 
-Test your implementation with small batch size to verify the correctness. You can parse the data.hdf5 into smaller chuncks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in test2.hdf5, test10.hdf5 and test100.hdf5 in the data folder. Maker sure the data file you feed in is the same as the batch_size you specify in the command line.
+Test your implementation with small batch size frist to verify the correctness. You can parse the data.hdf5 into smaller chuncks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in test2.hdf5, test10.hdf5 and test100.hdf5 in the data folder. Maker sure the data file you feed in has the same batch size as the `batch_size` you specify in the command line.
 
 ~~~
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 10
