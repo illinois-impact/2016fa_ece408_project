@@ -1,4 +1,4 @@
-FROM webgpu/rai:base
+FROM webgpu/rai:latest
 
 MAINTAINER Abdul Dakkak "dakkak@illinois.edu"
 
