@@ -44,8 +44,8 @@ endif (NOT CONFIG_USE_SYSTEM_HDF5)
 
 ### Find dependencies ###
 Find_Package(EnableCxx11 REQUIRED)
-Find_Package(ZLIB CONFIG REQUIRED)
-Find_Package(szip CONFIG REQUIRED)
+Find_Package(ZLIB REQUIRED)
+Find_Package(szip REQUIRED)
 Find_Package(hdf5 CONFIG REQUIRED)
 Find_Package(Range REQUIRED)
 Find_Package(CUDA REQUIRED)
