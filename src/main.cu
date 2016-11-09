@@ -4,6 +4,7 @@
 #include <iostream>
 #include <numeric>
 #include <valarray>
+#include <sys/time.h>
 
 #include <hdf5.h>
 
@@ -44,6 +45,10 @@ static void loadData(float *x, float *y) {
 
   hsize_t xdims[xndims];
   H5Sget_simple_extent_dims(xspace, xdims, NULL);
+  if (xdims[0] != FLAGS_batch_size) {
+    std::cout << "data size does not match batch size specified!\n";
+    exit(-1);
+  }
   std::cout << "xdims = " << xdims[0] << " x " << xdims[1] << " x " << xdims[2]
             << " x " << xdims[3] << "\n";
 
@@ -280,10 +285,19 @@ int main(int argc, char **argv) {
   float *fc2   = allocate<float>(fc2dims);
   loadModel(conv1, conv2, fc1, fc2);
 
+
   // Perform foward opertion
   int *out = zeros<int>(FLAGS_batch_size);
+
+  struct timeval start, end;
+  gettimeofday(&start, NULL);
+
   forward_operation(x, conv1, conv2, fc1, fc2, out);
 
+  gettimeofday(&end, NULL);
+  float elapsed  = (end.tv_sec + end.tv_usec/1000000.0f) - (start.tv_sec + start.tv_usec/1000000.0f);
+
+  printf("%f\n", elapsed);
   // Get reference
   int *ref = zeros<int>(FLAGS_batch_size);
   argmax(y, rdims, ref);
@@ -295,7 +309,7 @@ int main(int argc, char **argv) {
       num_correct++;
     }
   }
-  std::cout << "Done. Correctness: "
+  std::cout << "Done with " << FLAGS_batch_size << " queries in " << elapsed << "s. Correctness: "
             << static_cast<float>(num_correct) / FLAGS_batch_size << "\n";
 
   delete[] x;
