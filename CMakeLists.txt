@@ -96,9 +96,12 @@ set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} "-G")
 
 include_directories(
     "${ZLIB_INCLUDE_DIRS}"
-    "${HDF5_INCLUDE_DIR}"
     "${SRC_DIR}"
 )
+
+if (NOT "${HDF5_INCLUDE_DIR}" STREQUAL "")
+    include_directories("${HDF5_INCLUDE_DIR}")
+endif (NOT "${HDF5_INCLUDE_DIR}" STREQUAL "")
 
 set(PROJECT_TARGET ece408)
 cuda_add_executable(${PROJECT_TARGET} ${SOURCES})

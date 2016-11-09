@@ -11,9 +11,6 @@
 
 using namespace util::lang;
 
-#define DEFAULT_DATA_PATH "../data/data.hdf5"
-#define DEFAULT_MODEL_PATH "../data/model.hdf5"
-
 #define NUM_ROWS 28
 #define NUM_COLS 28
 #define NUM_CHANNELS 1
@@ -166,10 +163,9 @@ static void average_pool(const float *X, const int xdims[4],
 
 static void fully_forward(const float *X, const int xdims[2], float *W,
                           const int wdims[2], float *Y, const int ydims[2]) {
-  float sum;
   for (const auto i : range(0, xdims[0])) {
     for (const auto j : range(0, wdims[1])) {
-      sum = 0;
+      float sum = 0;
       for (const auto k : range(0, xdims[1])) {
         sum += X[i * xdims[1] + k] * W[k * wdims[1] + j];
       }
@@ -260,10 +256,8 @@ int main(int argc, char **argv) {
   if (argc != 3 && argc != 4) {
     std::cerr << "\n"
               << "This program does the forared opertion for the CNN.  "
-                 "Sample usage: "
-              << argv[0] << "[" << DEFAULT_DATA_PATH << "] "
-              << "[" << DEFAULT_MODEL_PATH << "]"
-              << "\n";
+                 "Sample usage: \n"
+              << argv[0] << " [../data/data.hdf5] [../data/model.hdf5]\n";
     return -1;
   }
   FLAGS_data  = std::string(argv[1]);
@@ -296,9 +290,10 @@ int main(int argc, char **argv) {
 
   // Calculate correctness
   int num_correct = 0;
-  for (int i = 0; i < FLAGS_batch_size; ++i) {
-    if (out[i] == ref[i])
+  for (const auto i : range(0, FLAGS_batch_size)) {
+    if (out[i] == ref[i]) {
       num_correct++;
+    }
   }
   std::cout << "Done. Correctness: "
             << static_cast<float>(num_correct) / FLAGS_batch_size << "\n";
