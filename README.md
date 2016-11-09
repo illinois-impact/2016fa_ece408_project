@@ -27,30 +27,35 @@ Installation guides and the list of supported C compilers for [Windows](http://d
 also found in the [CUDA Toolkit Documentation Page](http://docs.nvidia.com/cuda/index.html).
 
 Aside from a C compiler and the CUDA 8 Toolkit, [CMake](https://cmake.org/) 3.1 or later is required
-to generate build scripts for your target IDE and compiler. The next section describes
-the process of compiling and running a lab.
+to generate build scripts for your target IDE and compiler. 
 
 ## How to Build
 
-There are two options to build this project, the first is using the [hunter package manager](https://github.com/ruslo/hunter)
- and the other is using [docker](https://www.docker.com/).
- 
+There are two options to build this project, the first is using the [hunter package manager](https://github.com/ruslo/hunter) and the other is using [docker](https://www.docker.com/).
+We sugguest using cmake along with hunter.
+
 ### Using Hunter Package Manager
 
 By default, the compilation uses the [hunter](https://github.com/ruslo/hunter).
-
 This method requires that you have the CUDA toolkit installed on your machine.
+
+In the project folder, do
+~~~
+mkdir build;cd build;cmake ..
+~~~
+
+If you need other library(no cuBLAS or cuDNN), you need to modify the CMakeLists.txt.
 
 ### Using Docker
  
  [![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/webgpu/ece408project/)
 
-Included is a [Docker](http://docker.io/) build file. This file can be used to build and launch a container which contains this project along with all the software required to run it. Using a GPU within Docker is only supported on Linux, and we recommend using [NVIDIA-Docker](https://github.com/NVIDIA/nvidia-docker) to run the Docker image. To build the Docker container do
+Included is a [Docker](http://docker.io/) build file. This file can be used to build and launch a container which contains this project along with all the software required to run it. Using a GPU within Docker is only supported on Linux, and we recommend using [NVIDIA-Docker](https://github.com/NVIDIA/nvidia-docker) to run the Docker image. To build the Docker container, do
 
 ~~~
 docker build . -t ece408project
 ~~~
-
+in the projcet foler. 
 Once built, the `ece408project` image would be listed by the `docker images` command. This will compile your project. You can launch the docker image using
 
 ~~~
@@ -65,4 +70,10 @@ docker run -it ece408project
 
 an optional `batch_size` can be specified
 
+## How to test 
 
+Test your implementation with small batch size to verify the correctness. You can parse the data.hdf5 into smaller chuncks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in test2.hdf5, test10.hdf5 and test100.hdf5 in the data folder. Maker sure the data file you feed in is the same as the batch_size you specify in the command line.
+
+~~~
+./ece408 ../data/test10.hdf5 ../data/model.hdf5 10
+~~~
