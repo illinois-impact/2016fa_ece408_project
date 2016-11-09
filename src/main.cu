@@ -6,7 +6,6 @@
 #include <valarray>
 
 #include <hdf5.h>
-#include <range.hpp>
 
 #include "utils.hpp"
 
