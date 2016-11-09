@@ -1,5 +1,18 @@
 # ECE 408 Project
 
+The goal of this project is to accelerate the forward propagation of the Convolutional Neural Network(CNN) with GPUs. The sequential implementation provided follows the basic algorithm 16.4 and 16.5 decribed in [book chapter 16](https://wiki.illinois.edu/wiki/display/ece408f16/Book+Chapters?preview=/602518692/603851747/3rd-Edition-Chapter16-case-study-DNN-FINAL.pdf). The dataset and model are from the [MNIST database](http://yann.lecun.com/exdb/mnist/).
+
+## CNN and MNIST
+
+Read the book chapter and familiar youself with CNN.
+
+The model is trained using 60,000 examples(training set images) and the provided data is 10,000 batched queries(test set images). The CNN is expected to get ~97% accuracy on the provided data.
+
+The data and model are in [HDF5](https://support.hdfgroup.org/HDF5/) format.
+
+## CUDA Implementation
+
+Book chapter 16.3 and 16.4 provide a basic CUDA implementation of forward propagation of convolutional layer and possible optimization. You CUDA implementation would be evaluated based on performnace and accuracy. Apply any optimization you think would bring benefit. Also Your CUDA implentation can use any BLAS library(e.g. cuBLAS) but no direct CNN library like cuDNN is allowed.
 
 ## How to Build
 
@@ -11,8 +24,7 @@ the other is using [docker](https://www.docker.com/).
 ### Using Hunter Package Manager
 
 
-By default, the compilation uses the [hunter]
-
+By default, the compilation uses the [hunter](https://github.com/ruslo/hunter).
 
 This method requires that you have the CUDA toolkit installed on your machine.
 
@@ -33,7 +45,7 @@ docker run -it ece408project
 
 
 
-## Running
+## How to Run
 
 
 ~~~
@@ -41,7 +53,6 @@ docker run -it ece408project
 ~~~
 
 an optional `batch_size` can be specified
-
 
 
 ## Requirements
