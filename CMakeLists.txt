@@ -19,7 +19,7 @@ HunterGate(
     SHA1 "00ab627d3d4fe5151e15b6ab2b1b1da17650984a"
 )
 
-project(ECE408Project CXX)
+project(ECE408Project)
 
 
 include(CMakeToolsHelpers OPTIONAL)
@@ -37,9 +37,9 @@ set(CONFIG_USE_SYSTEM_HDF5 "OFF" CACHE BOOL "Turn on to enable using the system 
 # now hunter can be used, like
 hunter_add_package(Sugar)
 if (NOT CONFIG_USE_SYSTEM_HDF5)
-  hunter_add_package(ZLIB)
+  # hunter_add_package(ZLIB)
   hunter_add_package(hdf5)
-  hunter_add_package(szip)
+  # hunter_add_package(szip)
 endif (NOT CONFIG_USE_SYSTEM_HDF5)
 
 ### Find dependencies ###
