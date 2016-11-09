@@ -1,4 +1,4 @@
-FROM webgpu/rai:base
+FROM webgpu/rai:latest
 
 MAINTAINER Abdul Dakkak "dakkak@illinois.edu"
 
@@ -10,6 +10,11 @@ LABEL com.webgpu.project.ece408.version="0.0.1"
 
 COPY . ${SRCDIR}
 COPY ./data ${DATADIR}
+
+USER root
+RUN chown -R ${USERNAME} ${HOME}
+RUN find ${HOME} -type f -exec touch {} +
+USER ${USERNAME}
 
 WORKDIR ${BUILDDIR}
 RUN cmake -DCONFIG_USE_HUNTER=OFF ${SRCDIR}
