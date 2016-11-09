@@ -47,3 +47,5 @@ bld
 Debug
 
 build-*/
+*.log
+README.pdf
