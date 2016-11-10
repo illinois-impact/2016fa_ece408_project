@@ -65,10 +65,10 @@ docker run -it ece408project
 ## How to Run
 
 ~~~
-./ece408 ../data/data.hdf5 ../data/model.hdf5 [batch_size]
+./ece408 ../data/data.hdf5 ../data/model.hdf5 batch_size
 ~~~
 
-an optional `batch_size` can be specified
+the `batch_size` must match the size of the dataset. If `batch_size` is unspecified, the default value is 10000, which is also the size of `data.hdf5`.
 
 ## How to test 
 
