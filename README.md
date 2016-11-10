@@ -4,19 +4,19 @@ The goal of this project is to accelerate the forward propagation of the Convolu
 
 ## CNN and MNIST
 
-Read the book chapter and familiar youself with CNN.
+Read the book chapter and familiarize youself with CNN.
 
-The model is trained using 60,000 examples(training set images) and the provided data is 10,000 batched queries(test set images). The CNN is expected to get ~97% accuracy on the provided data.
+The model is trained using 60,000 examples (training set images) and the provided data is 10,000 batched queries (test set images). The CNN is expected to get ~97% accuracy on the provided data.
 
 The data and model are in [HDF5](https://support.hdfgroup.org/HDF5/) format.
 
 ## CUDA Implementation
 
-Book chapter 16.3 and 16.4 provide a basic CUDA implementation of forward propagation of convolutional layer and possible optimization. Your CUDA implementation would be evaluated based on performnace and accuracy. Apply any optimization you think would bring benefit. You should not use cuBLAS or cuDNN but we encourage you to compare your implementation with those libraries(profiling information of them could be helpful).
+Book chapter 16.3 and 16.4 provide a basic CUDA implementation of forward propagation of convolutional layer and possible optimization. Your CUDA implementation would be evaluated based on performance and accuracy. Apply any optimization you think would bring benefit. You should not use cuBLAS or cuDNN but we encourage you to compare your implementation with those libraries (profiling information of them could be helpful).
 
 ## Requirements
 
-The project requires a CUDA supported operating system,
+The project requires a CUDA-supported operating system,
 C compiler, and the CUDA 8 Toolkit. The CUDA 8 Toolkit can be downloaded
 from the [CUDA Download](https://developer.nvidia.com/cuda-downloads) page.
 Instructions on how to install the CUDA Toolkit are available in the
@@ -44,7 +44,7 @@ In the project folder, do
 mkdir build;cd build;cmake ..
 ~~~
 
-If you need other library(no cuBLAS or cuDNN), you need to modify the CMakeLists.txt.
+If you need another library (no cuBLAS or cuDNN), you need to modify the CMakeLists.txt.
 
 ### Using Docker
  
