@@ -298,8 +298,7 @@ int main(int argc, char **argv) {
 
   // get elapsed time in microseconds
   const auto elapsed =
-      std::chrono::duration_cast<std::chrono::microseconds>(end - start)
-          .count();
+      std::chrono::duration<double, std::milli>(end - start).count();
 
   // Get reference
   int *ref = zeros<int>(FLAGS_batch_size);
@@ -313,7 +312,7 @@ int main(int argc, char **argv) {
     }
   }
   std::cout << "Done with " << FLAGS_batch_size << " queries in "
-            << "elapsed = " << elapsed << "us. Correctness: "
+            << "elapsed = " << elapsed << " milliseconds. Correctness: "
             << static_cast<float>(num_correct) / FLAGS_batch_size << "\n";
 
   delete[] x;
