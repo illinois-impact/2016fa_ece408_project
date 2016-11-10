@@ -288,14 +288,18 @@ int main(int argc, char **argv) {
   // Perform foward opertion
   int *out = zeros<int>(FLAGS_batch_size);
 
-  struct timeval start, end;
-  gettimeofday(&start, NULL);
+  // get start time
+  const auto start = now();
 
   forward_operation(x, conv1, conv2, fc1, fc2, out);
 
-  gettimeofday(&end, NULL);
-  double elapsed = (end.tv_sec * 1000000 + end.tv_usec) -
-                   (start.tv_sec * 1000000 + start.tv_usec);
+  // get end time
+  const auto end = now();
+
+  // get elapsed time in microseconds
+  const auto elapsed =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+          .count();
 
   // Get reference
   int *ref = zeros<int>(FLAGS_batch_size);
@@ -309,7 +313,7 @@ int main(int argc, char **argv) {
     }
   }
   std::cout << "Done with " << FLAGS_batch_size << " queries in "
-            << elapsed / 1000000.0f << "s. Correctness: "
+            << "elapsed = " << elapsed << "us. Correctness: "
             << static_cast<float>(num_correct) / FLAGS_batch_size << "\n";
 
   delete[] x;

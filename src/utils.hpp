@@ -1,6 +1,8 @@
 #ifndef __UTILS_HPP__
 #define __UTILS_HPP__
 
+#include <chrono>
+
 #ifdef __GNUC__
 #define unused __attribute__((unused))
 #else // __GNUC__
@@ -64,6 +66,10 @@ static T *zeros(const SzTy (&dims)[N]) {
   T *res         = allocate<T, SzTy>(len);
   std::fill(res, res + N, static_cast<T>(0));
   return res;
+}
+
+static std::chrono::time_point<std::chrono::high_resolution_clock> now() {
+  return std::chrono::high_resolution_clock::now();
 }
 
 #endif // __UTILS_HPP__
