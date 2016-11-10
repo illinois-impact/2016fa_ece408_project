@@ -77,3 +77,8 @@ Test your implementation with small batch size frist to verify the correctness. 
 ~~~
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 10
 ~~~
+
+## What to deliver
+
+Code and report. Make sure you have a working CUDA implementation before applying any optimizations. Report should focus on optimizations you have tried and analysis of its benefits if any. No paper limit on report but try to be concise and back your discussion with performance analysis.
+
