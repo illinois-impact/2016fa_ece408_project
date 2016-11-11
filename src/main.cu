@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iostream>
 #include <numeric>
+#include <map>
 #include <sys/time.h>
 #include <valarray>
 
@@ -17,7 +18,7 @@
 #define NUM_DIGITS 10
 
 static int FLAGS_batch_size = 10000;
-static std::string FLAGS_data{};
+static std::string FLAGS_testdata{};
 static std::string FLAGS_model{};
 
 // Data and reference data dimensions
@@ -30,9 +31,10 @@ static int conv2dims[] = {5, 5, 32, 64};
 static int fc1dims[]   = {1024, 128};
 static int fc2dims[]   = {128, 10};
 
-static void loadData(float *x, float *y) {
+static int loadData(float *x, float *y) {
   // Open the data file
-  const auto file_id = H5Fopen(FLAGS_data.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  const auto file_id =
+      H5Fopen(FLAGS_testdata.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
   // Open the dataset x and y
   const auto x_id = H5Dopen2(file_id, "/x", H5P_DEFAULT);
@@ -43,14 +45,14 @@ static void loadData(float *x, float *y) {
   const auto xndims = H5Sget_simple_extent_ndims(xspace);
   assert(xndims == 4);
 
-  hsize_t xdims[xndims];
-  H5Sget_simple_extent_dims(xspace, xdims, NULL);
-  if (xdims[0] != FLAGS_batch_size) {
+  hsize_t input_dims[xndims];
+  H5Sget_simple_extent_dims(xspace, input_dims, NULL);
+  if (input_dims[0] != FLAGS_batch_size) {
     std::cout << "data size does not match batch size specified!\n";
-    exit(-1);
+    return 1; // return error
   }
-  std::cout << "xdims = " << xdims[0] << " x " << xdims[1] << " x " << xdims[2]
-            << " x " << xdims[3] << "\n";
+  std::cout << "input dimensions = " << input_dims[0] << " x " << input_dims[1]
+            << " x " << input_dims[2] << " x " << input_dims[3] << "\n";
 
   // Read the dataset x and y
   check_success(
@@ -64,6 +66,9 @@ static void loadData(float *x, float *y) {
 
   // Close the file
   check_success(H5Fclose(file_id));
+
+  // return success
+  return 0;
 }
 
 static void loadModel(float *conv1, float *conv2, float *fc1, float *fc2) {
@@ -262,16 +267,29 @@ int main(int argc, char **argv) {
               << "This program performs the forward opertion step for "
                  "Convolutional Neural Network(CNN).  "
                  "Sample usage: \n"
-              << argv[0] << " [../data/test10.hdf5] [../data/model.hdf5] [10]\n";
+              << argv[0]
+              << " [../data/test10.hdf5] [../data/model.hdf5] [10]\n";
     return -1;
   }
-  FLAGS_data  = std::string(argv[1]);
-  FLAGS_model = std::string(argv[2]);
-  if (argc == 4) {
+  FLAGS_testdata = std::string(argv[1]);
+  FLAGS_model    = std::string(argv[2]);
+  if (argc == 3) {
+    const std::map<std::string, int> default_batch_sizes{
+        {"../data/test2.hdf5", 2},
+        {"../data/test10.hdf5", 10},
+        {"../data/test100.hdf5", 100},
+        {"../data/testdata.hdf5", 10000}};
+    const auto batch_size_in_map = default_batch_sizes.find(FLAGS_testdata);
+    if (batch_size_in_map == default_batch_sizes.end()) {
+      std::cerr << "\nERROR:: The batch_size must be specified.\n";
+      return -1;
+    }
+    FLAGS_batch_size = batch_size_in_map->second;
+  } else if (argc == 4) {
     FLAGS_batch_size = atoi(argv[3]);
-    xdims[0]         = FLAGS_batch_size;
-    rdims[0]         = FLAGS_batch_size;
   }
+  xdims[0] = FLAGS_batch_size;
+  rdims[0] = FLAGS_batch_size;
 
   // Load data into x and y
   float *x = allocate<float>(xdims);
