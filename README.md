@@ -133,7 +133,7 @@ To check for CUDA errors, specialize the `check_success` function in `utils.hpp`
 ~~~{.cpp}
 template <>
 bool check_success<cudaError_t>(const cudaError_t &err) {
-  const auto res = err != cudaSuccess;
+  const auto res = err == cudaSuccess;
   if (res == true) {
     return res;
   }
