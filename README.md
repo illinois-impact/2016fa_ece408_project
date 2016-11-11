@@ -18,7 +18,7 @@ Book chapters 16.3 and 16.4 provide a basic CUDA implementation of forward propa
 
 The project requires a CUDA-supported operating system, C compiler, and the CUDA 8 Toolkit. The CUDA 8 Toolkit can be downloaded from the [CUDA Download](https://developer.nvidia.com/cuda-downloads) page. Instructions on how to install the CUDA Toolkit are available in the [Quick Start page](http://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html). Installation guides and the list of supported C compilers for [Windows](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html), [Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html), and [OSX](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html) are also found in the [CUDA Toolkit Documentation Page](http://docs.nvidia.com/cuda/index.html).
 
-Aside from a C compiler and the CUDA 8 Toolkit, [CMake](https://cmake.org/) 3.1 or later is required to generate build scripts for your target IDE and compiler.
+Aside from a C compiler and the CUDA 8 Toolkit, [CMake](https://cmake.org/) 3.1 or later is required to generate build scripts for your target IDE and compiler. On windows, we require Visual Studio 2015 (Service Pack 3) which you can download from the webstore. For other systems, a CUDA compatible compiler is required (e.g. for OSX the [clang compiler](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html#system-requirements) is the only one supported).
 
 ## How to Build
 
@@ -30,7 +30,7 @@ By default, the compilation uses the [Hunter](https://github.com/ruslo/hunter) -
 
 Assuming that you have checked out the project into `$SRCDIR` do
 
-~~~
+~~~{.sh}
 cd $SRCDIR
 mkdir build
 cd build
@@ -39,7 +39,7 @@ cmake $SRCDIR
 
 This will download the required software needed for the project. You may see some warning while the system is compiling _HDF5_, which you can ignore. Once CMake has been run, a `Makefile` is generated so you can then perform `make` to buidl the project.
 
-~~~
+~~~{.sh}
 make
 ~~~
 
@@ -53,30 +53,30 @@ If you need to use another library, you need have to modify the `CMakeLists.txt`
 
 Also included is a [Docker](http://docker.io/) build file. This file is a specification for a Docker container image. It can be used to build and launch a container (think of a virtual machine) which contains this project along with all the software required to run it. Using a GPU within Docker is only supported on Linux(you can compile and run the serial code on any operating system), and we recommend using [NVIDIA-Docker](https://github.com/NVIDIA/nvidia-docker) to run the Docker image. To build the Docker container, do
 
-~~~
+~~~{.sh}
 cd $SRCDIR
 docker build . -t ece408project
 ~~~
 
 Once built, the `ece408project` image would be listed by the `docker images` command. This will compile your project. You can launch the docker image using
 
-~~~
+~~~{.sh}
 docker run -it ece408project
 ~~~
 
 ## How to Run
 
-~~~
-./ece408 ../data/testdata.hdf5 ../data/model.hdf5 batch_size
+~~~{.sh}
+./ece408 ../data/test10.hdf5 ../data/model.hdf5 batch_size
 ~~~
 
 the `batch_size` must match the size of the dataset. If `batch_size` is unspecified, the default value is 10000, which is also the size of `data.hdf5`.
 
 ## How to Test
 
-Test your implementation with small batch size frist to verify the correctness. You can parse the data.hdf5 into smaller chuncks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in test2.hdf5, test10.hdf5 and test100.hdf5 in the data folder. Maker sure the data file you feed in has the same batch size as the `batch_size` you specify in the command line.
+Test your implementation with small batch size frist to verify the correctness. You can parse the `data/test100.hdf5` into smaller chuncks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in `data/test2.hdf5`, `data/test10.hdf5` and `data/test100.hdf5` in the data folder. Maker sure the data file you feed in has the same batch size as the `batch_size` you specify in the command line.
 
-~~~
+~~~{.sh}
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 10
 ~~~
 
@@ -87,7 +87,7 @@ Code and report. Make sure you have a working CUDA implementation before applyin
 
 ## Utilities
 
-We provide a few utilities in the `utils.hpp` file.
+We provide a some helper utility functions in the `utils.hpp` file.
 
 ### How to Time
 
@@ -121,6 +121,28 @@ for (const auto ii = 0; ii < N; ii++) {
 }
 ~~~
 
+### CUDA Check
+
+To check for CUDA errors, specialize the `check_success` function in `utils.hpp` to also handle `cudaError_t`. For example:
+
+~~~{.cpp}
+template <>
+bool check_success<herr_t>(const cudaError_t &err) {
+  const auto res = err != cudaSuccess;
+  if (res == true) {
+    return res;
+  }
+  std::cout << "Failed in CUDA. Error = " << cudaGetErrorString(err) << std::endl;
+  assert(res);
+  return res;
+}
+~~~
+
+`check_success` can then be used when calling CUDA functions:
+
+~~~{.cpp}
+check_success(cudaFree(deviceData);)
+~~~
 
 ## Reporting Issues
 
