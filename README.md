@@ -67,7 +67,7 @@ docker run -it ece408project
 ## How to Run
 
 ~~~
-./ece408 ../data/data.hdf5 ../data/model.hdf5 batch_size
+./ece408 ../data/testdata.hdf5 ../data/model.hdf5 batch_size
 ~~~
 
 the `batch_size` must match the size of the dataset. If `batch_size` is unspecified, the default value is 10000, which is also the size of `data.hdf5`.
@@ -84,7 +84,6 @@ Test your implementation with small batch size frist to verify the correctness. 
 
 Code and report. Make sure you have a working CUDA implementation before applying any optimizations. Report should focus on optimizations you have tried and analysis of its benefits if any. No paper limit on report but try to be concise and back your discussion with performance analysis.
 
-=======
 
 ## Utilities
 
