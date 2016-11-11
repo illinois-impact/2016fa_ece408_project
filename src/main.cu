@@ -262,7 +262,7 @@ int main(int argc, char **argv) {
               << "This program performs the forward opertion step for "
                  "Convolutional Neural Network(CNN).  "
                  "Sample usage: \n"
-              << argv[0] << " [../data/data.hdf5] [../data/model.hdf5]\n";
+              << argv[0] << " [../data/testdata.hdf5] [../data/model.hdf5]\n";
     return -1;
   }
   FLAGS_data  = std::string(argv[1]);
