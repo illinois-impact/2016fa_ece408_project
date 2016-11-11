@@ -70,7 +70,7 @@ docker run -it ece408project
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 batch_size
 ~~~
 
-the `batch_size` must match the size of the dataset. If `batch_size` is unspecified, the default value is 10000, which is also the size of `data.hdf5`.
+the `batch_size` must match the size of the dataset. If `batch_size` is unspecified, the default value is dependent on the input (10 for "../data/test10.hdf5", ..., 10000 for "../data/testfull.hdf5"), which is also the size of `data.hdf5`.
 
 ## How to Test
 

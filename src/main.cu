@@ -278,10 +278,10 @@ int main(int argc, char **argv) {
         {"../data/test2.hdf5", 2},
         {"../data/test10.hdf5", 10},
         {"../data/test100.hdf5", 100},
-        {"../data/testdata.hdf5", 10000}};
+        {"../data/testfull.hdf5", 10000}};
     const auto batch_size_in_map = default_batch_sizes.find(FLAGS_testdata);
     if (batch_size_in_map == default_batch_sizes.end()) {
-      std::cerr << "\nERROR:: The batch_size must be specified.\n";
+      std::cerr << "\nERROR:: Unrecognized file " << FLAGS_testdata << " batch_size must be specified.\n";
       return -1;
     }
     FLAGS_batch_size = batch_size_in_map->second;
