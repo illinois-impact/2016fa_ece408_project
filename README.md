@@ -82,7 +82,10 @@ Test your implementation with small batch size frist to verify the correctness. 
 
 ## What to deliver
 
-Code and report. Make sure you have a working CUDA implementation before applying any optimizations. Report should focus on optimizations you have tried and analysis of its benefits if any. No paper limit on report but try to be concise and back your discussion with performance analysis.
+* Code 
+* Report 
+
+Make sure you have a working CUDA implementation before applying any optimizations. The report should describe and evaluate the optimizations you tried. The report does not have a page limit, but as usual, you should strive to be thorough, concise, and quantitative in your performance analysis.
 
 
 ## Utilities
