@@ -22,11 +22,11 @@ Aside from a C compiler and the CUDA 8 Toolkit, [CMake](https://cmake.org/) 3.1 
 
 ## How to Build
 
-There are two options to build this project, the first is using the [Hunter Package Manager](https://github.com/ruslo/hunter) and the other is using [Docker](https://www.docker.com/). We sugguest using CMake along with Hunter, but it is known not to work on all operating systems. In this case, we suggest that you either using Docker or install the libraries needed (mainly `HDF5`).
+There are two options to build this project, the first is using the [Hunter] package manager and the other is using [Docker](https://www.docker.com/). We sugguest using CMake along with Hunter, but it is known not to work on all operating systems. In this case, we suggest that you either using Docker or install the libraries needed (mainly `HDF5`).
 
 ### Using Hunter Package Manager
 
-By default, the compilation uses the [Hunter](https://github.com/ruslo/hunter) --- a C package manager. This method requires that you have the CUDA toolkit installed on your machine.
+By default, the compilation uses the [Hunter] --- a C package manager. This method requires that you have the CUDA toolkit installed on your machine.
 
 Assuming that you have checked out the project into `$SRCDIR` do
 
@@ -37,7 +37,7 @@ cd build
 cmake $SRCDIR
 ~~~
 
-This will download the required software needed for the project. You may see some warning while the system is compiling _HDF5_, which you can ignore. Once CMake has been run, a `Makefile` is generated so you can then perform `make` to buidl the project.
+This will download the required software needed for the project (see the [hunter docs][hunterdoc] for more information). You may see some warning while the system is compiling _HDF5_, which you can ignore. Once CMake has been run, a `Makefile` is generated so you can then perform `make` to buidl the project.
 
 ~~~{.sh}
 make
@@ -45,7 +45,7 @@ make
 
 If you do not plan on using `make`, examine the `cmake -G` option which allows you to generate XCode, Visual Studio, ... project configurations. You may also need to change the build type to enable/disable debugging and/or optimizations.
 
-If you need to use another library, you need have to modify the `CMakeLists.txt` and add the libraries to the `target_link_libraries` (and possibly the `include_directories`) section.
+If you need to use another library, you need have to modify the [`CMakeLists.txt`](https://github.com/webgpu/ece408project/blob/master/CMakeLists.txt) and add the libraries to the `target_link_libraries` (and possibly the `include_directories`) section. Documentation on the CMake commands is found in the [documentation page][cmakedoc].
 
 ### Using Docker Container
 
@@ -64,7 +64,7 @@ Once built, the `ece408project` image would be listed by the `docker images` com
 docker run -it ece408project
 ~~~
 
-## How to Run
+## Running the Serial Code
 
 ~~~{.sh}
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 batch_size
@@ -90,13 +90,13 @@ The report must be named `report.pdf`
 
 Make sure you have a working CUDA implementation before applying any optimizations.
 
-## Utilities
+## Utility Functions
 
-We provide a some helper utility functions in the `utils.hpp` file.
+We provide a some helper utility functions in the [`utils.hpp`][utilshpp] file.
 
 ### How to Time
 
-In `utils.hpp` a function called `now()` which allows you to get the current time at a high resolution. To measure the overhead of a function `f(args...)`, the pattern to use is:
+In [`utils.hpp`][utilshpp] a function called `now()` which allows you to get the current time at a high resolution. To measure the overhead of a function `f(args...)`, the pattern to use is:
 
 ~~~{.cpp}
 const auto tic = now();
@@ -107,9 +107,9 @@ std::cout << "Calling f(args...) took " << elapsed << "milliseconds\n";
 ~~~
 
 
-### Range Loops
+### Range For Loops
 
-Throughout the serial code, we use the [`range.hpp`](https://github.com/harrism/cpp11-range) to make the code easier to understand. Essentially,
+Throughout the serial code, we use the [`range.hpp`][rangehpp] to make the code easier to understand. Essentially,
 
 
 ~~~{.cpp}
@@ -151,4 +151,12 @@ check_success(cudaFree(deviceData));
 
 ## Reporting Issues
 
-Please use the [Github issue manager](https://github.com/webgpu/ece408project/issues) to report any issues or suggestions about the project.
+Please use the [Github issue manager] to report any issues or suggestions about the project.
+
+
+[utilshpp]: https://github.com/webgpu/ece408project/blob/master/src/utils.hpp
+[cmakedoc]: https://cmake.org/cmake/help/latest/
+[hunterdoc]: https://docs.hunter.sh/en/latest/
+[rangehpp]: https://github.com/harrism/cpp11-range
+[Github issue manager]: https://github.com/webgpu/ece408project/issues
+[Hunter]: https://github.com/ruslo/hunter
