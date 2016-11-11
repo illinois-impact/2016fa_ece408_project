@@ -121,7 +121,7 @@ for (const auto ii = 0; ii < N; ii++) {
 }
 ~~~
 
-### CUDA Check
+### Checking Errors
 
 To check for CUDA errors, specialize the `check_success` function in `utils.hpp` to also handle `cudaError_t`. For example:
 
