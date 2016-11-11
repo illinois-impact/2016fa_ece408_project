@@ -146,7 +146,7 @@ bool check_success<herr_t>(const cudaError_t &err) {
 `check_success` can then be used when calling CUDA functions:
 
 ~~~{.cpp}
-check_success(cudaFree(deviceData);)
+check_success(cudaFree(deviceData));
 ~~~
 
 ## Reporting Issues
