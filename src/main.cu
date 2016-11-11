@@ -314,7 +314,7 @@ int main(int argc, char **argv) {
   // get end time
   const auto end = now();
 
-  // get elapsed time in microseconds
+  // get elapsed time in milliseconds
   const auto elapsed =
       std::chrono::duration<double, std::milli>(end - start).count();
 
