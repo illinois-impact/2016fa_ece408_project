@@ -80,13 +80,15 @@ Test your implementation with small batch size frist to verify the correctness. 
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 10
 ~~~
 
-## What to deliver
+## What to Deliver
 
-* Code 
-* Report 
+A `.tar.gz` file which contains the report, code directory, the build scripts, and, possibly, the input dataset needs to be delivered to the Teaching Assistants.
 
-Make sure you have a working CUDA implementation before applying any optimizations. The report should describe and evaluate the optimizations you tried. The report does not have a page limit, but as usual, you should strive to be thorough, concise, and quantitative in your performance analysis.
+* Code:  A `USAGE` file needs to be placed included in the archive file which includes instructions on how to compile and run your code. If the report performs any profiling, the `USAGE` file must also specify how to run the performance measurements.
+* Report: A PDF version report must be included within the `.tar.gz` file. The report should describe and evaluate the optimizations you tried. The report does not have a page limit, but as usual, you should strive to be thorough, concise, and quantitative in your performance analysis.
+The report must be named `report.pdf`
 
+Make sure you have a working CUDA implementation before applying any optimizations.
 
 ## Utilities
 
