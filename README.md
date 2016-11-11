@@ -122,7 +122,6 @@ for (const auto ii = 0; ii < N; ii++) {
 ~~~
 
 
-## Issues
+## Reporting Issues
 
 Please use the [Github issue manager](https://github.com/webgpu/ece408project/issues) to report any issues or suggestions about the project.
->>>>>>> 34506be46acaf1c5aa942df9f16a4c15230912de
