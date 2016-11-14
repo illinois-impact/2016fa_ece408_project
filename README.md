@@ -90,6 +90,16 @@ The report must be named `report.pdf`
 
 Make sure you have a working CUDA implementation before applying any optimizations.
 
+## Optimization Oportunities
+
+The serial version of the code is amiacable to many optimization oportunities, the following is an incomplete set of them:
+
+- Optimize the CUDA memory copies to decrease the overhead of memory transfers
+- Overlapping the memory transfer and the compute and/or independent computations using CUDA streams
+- Performing layout transformations to get coallessed accesses or to make better use of the cache
+- Using low precision to perform the computation (for example using `float16` or binary values)
+- Based on the size of the convolution, utilitize better algorithms to perform the computation (for example using the [Winograd Kernel][https://www.nervanasys.com/winograd-2/])
+
 ## Utility Functions
 
 We provide a some helper utility functions in the [`utils.hpp`][utilshpp] file.
