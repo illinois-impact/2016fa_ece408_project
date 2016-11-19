@@ -1,0 +1,11 @@
+rai:
+  version: 0.1
+resources:
+  gpus: 1
+commands:
+  build:
+    - echo "Building project"
+    - cmake -DCONFIG_USE_HUNTER=OFF /src
+    - make
+    - ./ece408 /src/data/test2.hdf5 /src/data/model.hdf5 2
+    - nvprof --print-gpu-trace --analysis-metrics -o profile.nvprof ./ece408 /src/data/test2.hdf5 /src/data/model.hdf5 2
