@@ -6,7 +6,7 @@
 #ifdef __GNUC__
 #define unused __attribute__((unused))
 #else // __GNUC__
-#define uinused
+#define unused
 #endif // __GNUC__
 
 template <typename T>
@@ -64,7 +64,7 @@ template <typename T, typename SzTy, size_t N>
 static T *zeros(const SzTy (&dims)[N]) {
   const auto len = flattened_length(dims);
   T *res         = allocate<T, SzTy>(len);
-  std::fill(res, res + N, static_cast<T>(0));
+  std::fill(res, res + len, static_cast<T>(0));
   return res;
 }
 
