@@ -14,17 +14,150 @@ The data and model are in [HDF5](https://support.hdfgroup.org/HDF5/) format and 
 
 Book chapters 16.3 and 16.4 provide a basic CUDA implementation of forward propagation of convolutional layer and possible optimization. Your CUDA implementation would be evaluated based on performance and accuracy. Apply any optimization you think would bring benefit and feel free to modify any part of the code. You should not use `cuBLAS` or `cuDNN` for the implementation, but you are expected to compare your implementation with those libraries --- profiling the code as well as comparing the algorithms used (if algorithm information is publically available).
 
-## System Requirements
+## Remote Development Environment
+
+The easiest way to develop the project is to use rai through the following prebuilt binaries.
+
+**NOTE:** Even if you use your local development environment, your final code must run within the RAI system. Also, your final report performance measurements must be done within RAI.
+
+### Download Binaries
+
+The code is continously built and published. The client can be downloaded from
+(depending on your OS and Architecture):
+
+Operating System | Architecture  | Download Link
+-----------------|---------------|--------------
+ Linux           | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-386.tar.gz)
+ Linux           | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-amd64.tar.gz)
+ Linux           | armv5         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv5.tar.gz)
+ Linux           | armv6         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv6.tar.gz)
+ Linux           | armv7         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv7.tar.gz)
+ Linux           | arm64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-arm64.tar.gz)
+ Darwin          | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-386.tar.gz)
+ Darwin          | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-amd64.tar.gz)
+ Windows         | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-386.tar.gz)
+ Windows         | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-amd64.tar.gz)
+
+### Client
+
+#### Set up your Secret Key
+
+Each team will be contacted by a TA and given a secret key to use this service. Do not share your key with other teams.
+The secret key is used to authenticate you with the server.
+
+The `RAI_SECRET_KEY` and `RAI_TEAM_NAME` should be specified in
+your `~/.rai.profile` (linux/OSX) or `%HOME%/.rai.profile` (Windows) in the following way.
+
+    RAI_SECRET_KEY='Your Secret Key Here'
+    RAI_TEAM_NAME='Your Team Name Here'
+
+
+#### Run the Client
+
+To run the client, use
+
+    rai -d <project folder>
+
+From a user's point a view when the client runs, the local directory specified by `-d` gets uploaded to the server and
+extracted into the `/src` directory on the server. The server then executes the build commands from the `rai-build.yml`
+specification within the `/build` directory. Once the commands have been run, or there is an error, a
+zipped version of that `/build` directory is available from the server for download.
+
+The server limits the task time to be an hour with a maximum of 8GB of memory being used within a session.
+The output `/build` directory is only available to be downloaded from the server for a short amount of time.
+Networking is also disabled on the execution server.
+
+#### Details
+
+The client sends job submission requests to the rai server. The internal steps the client takes are as follows:
+
+1. The client creates an archive of your directory and posts it to Amazon S3
+2. The client creates a unique identifier (here called `ID`). These IDs are generated using
+  [`NewObjectId`](https://godoc.org/labix.org/v2/mgo/bson#NewObjectId).
+3. The client creates a job request and publishes to the `tasks` topic on the queue. The job request has the ID
+field with the value `ID` and is mashaled using using the [`bson`](https://godoc.org/labix.org/v2/mgo/bson) library.
+The reason for using `bson` is that we will want to store the results in mongodb in the future.
+4. The client subscribes to the topic `log-ID` and prints the results on that topic.
+5. The client stops listening when the message on the topic has a tag `TagEnd`.
+
+### Project Build Sepecification
+
+The `rai-build.yml` must exist in your project directory. If not available, then the system will use the default
+build script. In some cases you may not be able to execute certain commands, in this senario the current workaround
+is to create a bash file and insert the commands you need to run. You can then execute the bash script within
+`rai-build.yml`.
+
+
+The `rai-build.yml` is written as a [Yaml](http://yaml.org/) ([Spec](http://www.yaml.org/spec/1.2/spec.html))
+file and has the following structure.
+
+
+```yaml
+rai:
+  version: 0.1 # this is required
+  image: webgpu/rai:root # this is ignored at this moment with the webgpu/rai:root
+                         # image being used by default. webgpu/rai:root is a docker
+                         # image which can be viewed at https://hub.docker.com/r/webgpu/rai/
+resources:
+  gpus: 1 # currently this field is ignored, but in the future you'd be able to specify your
+          # system requirements
+commands:
+  build:
+    - echo "Building project"
+    # Since the system already contains the dependencies (like HDF5 and ZLib) we do not
+    # need the hunter package manager. This speeds up the compilation as well
+    - cmake -DCONFIG_USE_HUNTER=OFF /src
+    # Run the make file to compile the project.
+    - make
+    # here we break the long command into multiple lines. The Yaml
+    # format supports this using a block-strip command. See
+    # http://stackoverflow.com/a/21699210/3543720 for info
+    - >-
+      nvprof --analysis-metrics --print-api-trace --cpu-profiling on
+      --demangling on --export-profile profile.nvvp
+      --force-overwrite --log-file run.log --print-gpu-trace
+      -- ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
+```
+
+Syntax errors will be reported and the job will not be executed. You can check if your file is in
+a valid yaml format by using tools such as [Yaml Validator](http://codebeautify.org/yaml-validator).
+
+## Profiling
+
+Profiling can be performed using `nvprof`. Place the following build commands in your `rai-build.yml` file
+
+```yaml
+    - >-
+      nvprof --cpu-profiling on --export-profile timeline.nvprof --
+      ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
+    - >-
+      nvprof --cpu-profiling on --export-profile analysis.nvprof --analysis-metrics --
+      ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
+```
+
+You could change the input and test datasets. This will output two files `timeline.nvprof` and
+`analysis.nvprof` which can be viewed using the `nvvp` tool (by performing a `file>import`).
+
+*NOTE:* `nvvp` will only show performance metrics for GPU invocations, so it may not show any
+analysis when you only have serial code.
+
+### Project Submission
+
+The steps for final submission will be given at a later stage.
+
+## Local Development Environment
+
+**NOTE:** Even if you use your local development environment, your final code must run within the RAI system. Also, your final report performance measurements must be done within RAI.
 
 The project requires a CUDA-supported operating system, C compiler, and the CUDA 8 Toolkit. The CUDA 8 Toolkit can be downloaded from the [CUDA Download](https://developer.nvidia.com/cuda-downloads) page. Instructions on how to install the CUDA Toolkit are available in the [Quick Start page](http://docs.nvidia.com/cuda/cuda-quick-start-guide/index.html). Installation guides and the list of supported C compilers for [Windows](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html), [Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html), and [OSX](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html) are also found in the [CUDA Toolkit Documentation Page](http://docs.nvidia.com/cuda/index.html).
 
 Aside from a C compiler and the CUDA 8 Toolkit, [CMake](https://cmake.org/) 3.1 or later is required to generate build scripts for your target IDE and compiler. On windows, we require Visual Studio 2015 (Service Pack 3) which you can download from the webstore. For other systems, a CUDA compatible compiler is required (e.g. for OSX the [clang compiler](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html#system-requirements) is the only one supported).
 
-## How to Build
+### How to Build
 
 There are two options to build this project, the first is using the [Hunter] package manager and the other is using [Docker](https://www.docker.com/). We sugguest using CMake along with Hunter, but it is known not to work on all operating systems. In this case, we suggest that you either using Docker or install the libraries needed (mainly `HDF5`).
 
-### Using Hunter Package Manager
+#### Using Hunter Package Manager
 
 By default, the compilation uses the [Hunter] --- a C package manager. This method requires that you have the CUDA toolkit installed on your machine.
 
@@ -47,7 +180,7 @@ If you do not plan on using `make`, examine the `cmake -G` option which allows y
 
 If you need to use another library, you need have to modify the [`CMakeLists.txt`](https://github.com/webgpu/ece408project/blob/master/CMakeLists.txt) and add the libraries to the `target_link_libraries` (and possibly the `include_directories`) section. Documentation on the CMake commands is found in the [documentation page][cmakedoc].
 
-### Using Docker Container
+#### Using Docker Container
 
 [![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/webgpu/ece408project/)
 
@@ -64,7 +197,7 @@ Once built, the `ece408project` image would be listed by the `docker images` com
 docker run -it ece408project
 ~~~
 
-## Running the Serial Code
+### Running the Serial Code
 
 ~~~{.sh}
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 batch_size
