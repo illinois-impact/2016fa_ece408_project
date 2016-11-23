@@ -42,11 +42,9 @@ Operating System | Architecture  | Download Link
 
 #### Set up your Secret Key
 
-Each team will be contacted by a TA and given a secret key to use this service. Do not share your key with other teams.
-The secret key is used to authenticate you with the server.
+Each team will be contacted by a TA and given a secret key to use this service. Do not share your key with other teams. The secret key is used to authenticate you with the server.
 
-The `RAI_SECRET_KEY` and `RAI_TEAM_NAME` should be specified in
-your `~/.rai.profile` (linux/OSX) or `%HOME%/.rai.profile` (Windows) in the following way.
+The `RAI_SECRET_KEY` and `RAI_TEAM_NAME` should be specified in your `~/.rai.profile` (linux/OSX) or `%HOME%/.rai.profile` (Windows) in the following way.
 
     RAI_SECRET_KEY='Your Secret Key Here'
     RAI_TEAM_NAME='Your Team Name Here'
@@ -58,38 +56,26 @@ To run the client, use
 
     rai -d <project folder>
 
-From a user's point a view when the client runs, the local directory specified by `-d` gets uploaded to the server and
-extracted into the `/src` directory on the server. The server then executes the build commands from the `rai-build.yml`
-specification within the `/build` directory. Once the commands have been run, or there is an error, a
-zipped version of that `/build` directory is available from the server for download.
+From a user's point a view when the client runs, the local directory specified by `-d` gets uploaded to the server and extracted into the `/src` directory on the server. The server then executes the build commands from the `rai-build.yml` specification within the `/build` directory. Once the commands have been run, or there is an error, a zipped version of that `/build` directory is available from the server for download.
 
-The server limits the task time to be an hour with a maximum of 8GB of memory being used within a session.
-The output `/build` directory is only available to be downloaded from the server for a short amount of time.
-Networking is also disabled on the execution server.
+The server limits the task time to be an hour with a maximum of 8GB of memory being used within a session. The output `/build` directory is only available to be downloaded from the server for a short amount of time. Networking is also disabled on the execution server.
 
 #### Details
 
 The client sends job submission requests to the rai server. The internal steps the client takes are as follows:
 
 1. The client creates an archive of your directory and posts it to Amazon S3
-2. The client creates a unique identifier (here called `ID`). These IDs are generated using
-  [`NewObjectId`](https://godoc.org/labix.org/v2/mgo/bson#NewObjectId).
-3. The client creates a job request and publishes to the `tasks` topic on the queue. The job request has the ID
-field with the value `ID` and is mashaled using using the [`bson`](https://godoc.org/labix.org/v2/mgo/bson) library.
-The reason for using `bson` is that we will want to store the results in mongodb in the future.
+2. The client creates a unique identifier (here called `ID`). These IDs are generated using [`NewObjectId`](https://godoc.org/labix.org/v2/mgo/bson#NewObjectId).
+3. The client creates a job request and publishes to the `tasks` topic on the queue. The job request has the ID field with the value `ID` and is mashaled using using the [`bson`](https://godoc.org/labix.org/v2/mgo/bson) library. The reason for using `bson` is that we will want to store the results in mongodb in the future.
 4. The client subscribes to the topic `log-ID` and prints the results on that topic.
 5. The client stops listening when the message on the topic has a tag `TagEnd`.
 
 ### Project Build Sepecification
 
-The `rai-build.yml` must exist in your project directory. If not available, then the system will use the default
-build script. In some cases you may not be able to execute certain commands, in this senario the current workaround
-is to create a bash file and insert the commands you need to run. You can then execute the bash script within
-`rai-build.yml`.
+The `rai-build.yml` must exist in your project directory. If not available, then the system will use the default build script. In some cases you may not be able to execute certain commands, in this senario the current workaround is to create a bash file and insert the commands you need to run. You can then execute the bash script within `rai-build.yml`.
 
 
-The `rai-build.yml` is written as a [Yaml](http://yaml.org/) ([Spec](http://www.yaml.org/spec/1.2/spec.html))
-file and has the following structure.
+The `rai-build.yml` is written as a [Yaml](http://yaml.org/) ([Spec](http://www.yaml.org/spec/1.2/spec.html)) file and has the following structure.
 
 
 ```yaml
@@ -119,8 +105,7 @@ commands:
       -- ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
 ```
 
-Syntax errors will be reported and the job will not be executed. You can check if your file is in
-a valid yaml format by using tools such as [Yaml Validator](http://codebeautify.org/yaml-validator).
+Syntax errors will be reported and the job will not be executed. You can check if your file is in a valid yaml format by using tools such as [Yaml Validator](http://codebeautify.org/yaml-validator).
 
 ## Profiling
 
@@ -135,11 +120,9 @@ Profiling can be performed using `nvprof`. Place the following build commands in
       ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
 ```
 
-You could change the input and test datasets. This will output two files `timeline.nvprof` and
-`analysis.nvprof` which can be viewed using the `nvvp` tool (by performing a `file>import`).
+You could change the input and test datasets. This will output two files `timeline.nvprof` and `analysis.nvprof` which can be viewed using the `nvvp` tool (by performing a `file>import`).
 
-*NOTE:* `nvvp` will only show performance metrics for GPU invocations, so it may not show any
-analysis when you only have serial code.
+*NOTE:* `nvvp` will only show performance metrics for GPU invocations, so it may not show any analysis when you only have serial code.
 
 ### Project Submission
 
