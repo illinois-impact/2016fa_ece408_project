@@ -9,17 +9,6 @@ resources:
 commands:
   build:
     - echo "Building project"
-    - /bin/bash -c -- cd /src && ls
-    - cp /src/rai-build.yml .
     - cmake -DCONFIG_USE_HUNTER=OFF /src
     - make
     - ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
-    # here we break the long command into multiple lines. The Yaml
-    # format supports this using a block-strip command. See
-    # http://stackoverflow.com/a/21699210/3543720 for info. The lines are commented
-    # - >-
-    #   nvprof --cpu-profiling on --export-profile timeline.nvprof --
-    #   ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
-    # - >-
-    #   nvprof --cpu-profiling on --export-profile analysis.nvprof --analysis-metrics --
-    #   ./ece408 /src/data/test10.hdf5 /src/data/model.hdf5 10
