@@ -25,16 +25,16 @@ The easiest way to develop the project is to use rai through the following prebu
 The code is continuously built and published. The client can be downloaded from
 (depending on your OS and Architecture):
 
-Operating System | Architecture  | Download Link
------------------|---------------|--------------
- Linux           | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-386.tar.gz)
- Linux           | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-amd64.tar.gz)
- Linux           | armv5         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv5.tar.gz)
- Linux           | armv6         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv6.tar.gz)
- Linux           | armv7         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv7.tar.gz)
- Linux           | arm64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-arm64.tar.gz)
- OSX/Darwin      | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-386.tar.gz)
- OSX/Darwin      | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-amd64.tar.gz)
+Operating System | Architecture  | Stable Version Link                                                      | Development Version Link
+-----------------|---------------|--------------------------------------------------------------------------|--------------------------
+ Linux           | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-386.tar.gz)      | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-386.tar.gz)
+ Linux           | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-amd64.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-amd64.tar.gz)
+ Linux           | armv5         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv5.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv5.tar.gz)
+ Linux           | armv6         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv6.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv6.tar.gz)
+ Linux           | armv7         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv7.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv7.tar.gz)
+ Linux           | arm64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-arm64.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-arm64.tar.gz)
+ OSX/Darwin      | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-386.tar.gz)     | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-darwin-386.tar.gz)
+ OSX/Darwin      | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-amd64.tar.gz)   | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-darwin-amd64.tar.gz)
 <!--
  Windows         | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-386.tar.gz)
  Windows         | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-amd64.tar.gz)
