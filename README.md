@@ -16,7 +16,7 @@ Book chapters 16.3 and 16.4 provide a basic CUDA implementation of forward propa
 
 ## Remote Development Environment
 
-The easiest way to develop the project is to use rai through the following prebuilt binaries.
+The easiest way to develop the project is to use rai through the following prebuilt binaries. Currently we only support Linux and OSX. For students with Windows, you can use the Linux on [EWS](http://it.engineering.illinois.edu/ews) for RAI.
 
 **NOTE:** Even if you use your local development environment, your final code must run within the RAI system. Also, your final report performance measurements must be done within RAI.
 
