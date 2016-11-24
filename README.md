@@ -35,8 +35,10 @@ Operating System | Architecture  | Download Link
  Linux           | arm64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-arm64.tar.gz)
  OSX/Darwin      | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-386.tar.gz)
  OSX/Darwin      | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-amd64.tar.gz)
+<!--
  Windows         | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-386.tar.gz)
  Windows         | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-amd64.tar.gz)
+-->
 
 ### Client
 
