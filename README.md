@@ -22,7 +22,7 @@ The easiest way to develop the project is to use rai through the following prebu
 
 ### Download Binaries
 
-The code is continously built and published. The client can be downloaded from
+The code is continuously built and published. The client can be downloaded from
 (depending on your OS and Architecture):
 
 Operating System | Architecture  | Download Link
@@ -46,7 +46,7 @@ Operating System | Architecture  | Download Link
 
 Each team will be contacted by a TA and given a secret key to use this service. Do not share your key with other teams. The secret key is used to authenticate you with the server.
 
-The `RAI_SECRET_KEY` and `RAI_TEAM_NAME` should be specified in your `~/.rai.profile` (linux/OSX) or `%HOME%/.rai.profile` (Windows) in the following way.
+The `RAI_SECRET_KEY` and `RAI_TEAM_NAME` should be specified in your `~/.rai.profile` (linux/OSX) in the following way.
 
     RAI_SECRET_KEY='Your Secret Key Here'
     RAI_TEAM_NAME='Your Team Name Here'
