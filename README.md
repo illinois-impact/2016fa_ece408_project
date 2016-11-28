@@ -16,29 +16,26 @@ Book chapters 16.3 and 16.4 provide a basic CUDA implementation of forward propa
 
 ## Remote Development Environment
 
-The easiest way to develop the project is to use rai through the following prebuilt binaries. Currently we only support Linux and OSX. For students with Windows, you can use the Linux on [EWS](http://it.engineering.illinois.edu/ews) for RAI.
+The easiest way to develop the project is to use rai through the following prebuilt binaries. The stable version only supports Linux and OSX. For students with Windows, you can try the beta version or use the Linux on [EWS](http://it.engineering.illinois.edu/ews) for RAI.
 
 **NOTE:** Even if you use your local development environment, your final code must run within the RAI system. Also, your final report performance measurements must be done within RAI.
 
 ### Download Binaries
 
-The code is continuously built and published. The client can be downloaded from
-(depending on your OS and Architecture):
+The code is continuously built and published. The client can be downloaded from the following URLs (depending on your OS and Architecture):
 
-Operating System | Architecture  | Stable Version Link                                                      | Development Version Link
------------------|---------------|--------------------------------------------------------------------------|--------------------------
- Linux           | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-386.tar.gz)      | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-386.tar.gz)
- Linux           | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-amd64.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-amd64.tar.gz)
- Linux           | armv5         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv5.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv5.tar.gz)
- Linux           | armv6         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv6.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv6.tar.gz)
- Linux           | armv7         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv7.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv7.tar.gz)
- Linux           | arm64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-arm64.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-arm64.tar.gz)
- OSX/Darwin      | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-386.tar.gz)     | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-darwin-386.tar.gz)
- OSX/Darwin      | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-amd64.tar.gz)   | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-darwin-amd64.tar.gz)
-<!--
- Windows         | i386          | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-386.tar.gz)
- Windows         | amd64         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-windows-amd64.tar.gz)
--->
+| Operating System | Architecture | Stable Version Link                                                    | Development Version Link                                                    |
+| ---------------- | ------------ | ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Linux            | i386         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-386.tar.gz)    | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-386.tar.gz)     |
+| Linux            | amd64        | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-amd64.tar.gz)  | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-amd64.tar.gz)   |
+| Linux            | armv5        | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv5.tar.gz)  | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv5.tar.gz)   |
+| Linux            | armv6        | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv6.tar.gz)  | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv6.tar.gz)   |
+| Linux            | armv7        | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-armv7.tar.gz)  | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-armv7.tar.gz)   |
+| Linux            | arm64        | [URL](http://rai-server.s3.amazonaws.com/dist/rai-linux-arm64.tar.gz)  | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-linux-arm64.tar.gz)   |
+| OSX/Darwin       | i386         | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-386.tar.gz)   | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-darwin-386.tar.gz)    |
+| OSX/Darwin       | amd64        | [URL](http://rai-server.s3.amazonaws.com/dist/rai-darwin-amd64.tar.gz) | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-darwin-amd64.tar.gz)  |
+| Windows          | i386         | -                                                                      | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-windows-386.tar.gz)   |
+| Windows          | amd64        | -                                                                      | [URL](http://rai-server.s3.amazonaws.com/dist/dev/rai-windows-amd64.tar.gz) |
 
 ### Client
 
@@ -46,39 +43,44 @@ Operating System | Architecture  | Stable Version Link                          
 
 Each team will be contacted by a TA and given a secret key to use this service. Do not share your key with other teams. The secret key is used to authenticate you with the server.
 
-The `RAI_SECRET_KEY` and `RAI_TEAM_NAME` should be specified in your `~/.rai.profile` (linux/OSX) in the following way.
+The `RAI_SECRET_KEY`, `RAI_TEAM_NAME`, and `RAI_ACCESS_KEY` should be specified in your `~/.rai.profile` (linux/OSX) or `%HOME%/.rai.profile` (Windows -- for me this is `C:\Users\abduld\.rai.profile`) in the following way.
 
-    RAI_SECRET_KEY='Your Secret Key Here'
-    RAI_TEAM_NAME='Your Team Name Here'
+```bash
+RAI_TEAM_NAME='Your Team Name Here'
+RAI_USER_NAME='user'
+RAI_ACCESS_KEY='XXXXXXXX'
+RAI_SECRET_KEY='XXXXX'
+```
 
+The above will need to match the email you recieved from `postmaster@webgpu.com` on Nov 23. If you did not recieve the email, then contact the TA. Also, contact the TA with your team name as soon as possible.  Do not share your keys with other users or teams. The access and secret key is used to authenticate you with the server. Both the team name and the username are used to identify you to the system.
 
 #### Run the Client
 
 To run the client, use
 
-    rai -d <project folder>
+```bash
+rai -d <project folder>
+```
 
 From a user's point a view when the client runs, the local directory specified by `-d` gets uploaded to the server and extracted into the `/src` directory on the server. The server then executes the build commands from the `rai-build.yml` specification within the `/build` directory. Once the commands have been run, or there is an error, a zipped version of that `/build` directory is available from the server for download.
 
 The server limits the task time to be an hour with a maximum of 8GB of memory being used within a session. The output `/build` directory is only available to be downloaded from the server for a short amount of time. Networking is also disabled on the execution server.
 
-#### Details
+#### Internal Details (Ignore if not Interested)
 
 The client sends job submission requests to the rai server. The internal steps the client takes are as follows:
 
-1. The client creates an archive of your directory and posts it to Amazon S3
-2. The client creates a unique identifier (here called `ID`). These IDs are generated using [`NewObjectId`](https://godoc.org/labix.org/v2/mgo/bson#NewObjectId).
-3. The client creates a job request and publishes to the `tasks` topic on the queue. The job request has the ID field with the value `ID` and is mashaled using using the [`bson`](https://godoc.org/labix.org/v2/mgo/bson) library. The reason for using `bson` is that we will want to store the results in mongodb in the future.
-4. The client subscribes to the topic `log-ID` and prints the results on that topic.
-5. The client stops listening when the message on the topic has a tag `TagEnd`.
+1.  The client creates an archive of your directory and posts it to Amazon S3
+2.  The client creates a unique identifier (here called `ID`). These IDs are generated using [`NewObjectId`](https://godoc.org/labix.org/v2/mgo/bson#NewObjectId).
+3.  The client creates a job request and publishes to the `tasks` topic on the queue. The job request has the ID field with the value `ID` and is mashaled using using the [`bson`](https://godoc.org/labix.org/v2/mgo/bson) library. The reason for using `bson` is that we will want to store the results in mongodb in the future.
+4.  The client subscribes to the topic `log-ID` and prints the results on that topic.
+5.  The client stops listening when the message on the topic has a tag `TagEnd`.
 
 ### Project Build Sepecification
 
 The `rai-build.yml` must exist in your project directory. If not available, then the system will use the default build script. In some cases you may not be able to execute certain commands, in this senario the current workaround is to create a bash file and insert the commands you need to run. You can then execute the bash script within `rai-build.yml`.
 
-
 The `rai-build.yml` is written as a [Yaml](http://yaml.org/) ([Spec](http://www.yaml.org/spec/1.2/spec.html)) file and has the following structure.
-
 
 ```yaml
 rai:
@@ -124,11 +126,32 @@ Profiling can be performed using `nvprof`. Place the following build commands in
 
 You could change the input and test datasets. This will output two files `timeline.nvprof` and `analysis.nvprof` which can be viewed using the `nvvp` tool (by performing a `file>import`).
 
-*NOTE:* `nvvp` will only show performance metrics for GPU invocations, so it may not show any analysis when you only have serial code.
+_NOTE:_ `nvvp` will only show performance metrics for GPU invocations, so it may not show any analysis when you only have serial code.
 
 ### Project Submission
 
-The steps for final submission will be given at a later stage.
+For the final submission, we are currently working on a script that would submit your job as well as notify the teaching assistants. That information will be available as soon as possible. Regardless, you will need the above credentials to make your final submission.
+
+### Reporting Issues
+
+
+If emailing the TA with a problem, then please include the output of
+
+```
+rai version
+```
+
+as well as the output of
+
+```
+rai buildtime
+```
+
+you can also invoke the rai command with verbose and debug outputs using
+
+```
+rai --verbose --debug
+```
 
 ## Local Development Environment
 
@@ -148,18 +171,18 @@ By default, the compilation uses the [Hunter] --- a C package manager. This meth
 
 Assuming that you have checked out the project into `$SRCDIR` do
 
-~~~{.sh}
+```{.sh}
 cd $SRCDIR
 mkdir build
 cd build
 cmake $SRCDIR
-~~~
+```
 
 This will download the required software needed for the project (see the [hunter docs][hunterdoc] for more information). You may see some warning while the system is compiling _HDF5_, which you can ignore. Once CMake has been run, a `Makefile` is generated so you can then perform `make` to buidl the project.
 
-~~~{.sh}
+```{.sh}
 make
-~~~
+```
 
 If you do not plan on using `make`, examine the `cmake -G` option which allows you to generate XCode, Visual Studio, ... project configurations. You may also need to change the build type to enable/disable debugging and/or optimizations.
 
@@ -171,22 +194,22 @@ If you need to use another library, you need have to modify the [`CMakeLists.txt
 
 Also included is a [Docker](http://docker.io/) build file. This file is a specification for a Docker container image. It can be used to build and launch a container (think of a virtual machine) which contains this project along with all the software required to run it. Using a GPU within Docker is only supported on Linux(you can compile and run the serial code on any operating system), and we recommend using [NVIDIA-Docker](https://github.com/NVIDIA/nvidia-docker) to run the Docker image. To build the Docker container, do
 
-~~~{.sh}
+```{.sh}
 cd $SRCDIR
 docker build . -t ece408project
-~~~
+```
 
 Once built, the `ece408project` image would be listed by the `docker images` command. This will compile your project. You can launch the docker image using
 
-~~~{.sh}
+```{.sh}
 docker run -it ece408project
-~~~
+```
 
 ### Running the Serial Code
 
-~~~{.sh}
+```{.sh}
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 batch_size
-~~~
+```
 
 the `batch_size` must match the size of the dataset. If `batch_size` is unspecified, the default value is dependent on the input (10 for "../data/test10.hdf5", ..., 10000 for "../data/testfull.hdf5"), which is also the size of `data.hdf5`.
 
@@ -194,17 +217,17 @@ the `batch_size` must match the size of the dataset. If `batch_size` is unspecif
 
 Test your implementation with small batch size frist to verify the correctness. You can parse the `data/test100.hdf5` into smaller chuncks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in `data/test2.hdf5`, `data/test10.hdf5` and `data/test100.hdf5` in the data folder. Maker sure the data file you feed in has the same batch size as the `batch_size` you specify in the command line.
 
-~~~{.sh}
+```{.sh}
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 10
-~~~
+```
 
 ## What to Deliver
 
 A `.tar.gz` file which contains the report, code directory, the build scripts, and, possibly, the input dataset needs to be delivered to the Teaching Assistants.
 
-* Code:  A `USAGE` file needs to be placed included in the archive file which includes instructions on how to compile and run your code. If the report performs any profiling, the `USAGE` file must also specify how to run the performance measurements.
-* Report: A PDF version report must be included within the `.tar.gz` file. The report should describe and evaluate the optimizations you tried. The report does not have a page limit, but as usual, you should strive to be thorough, concise, and quantitative in your performance analysis.
-The report must be named `report.pdf`
+-   Code:  A `USAGE` file needs to be placed included in the archive file which includes instructions on how to compile and run your code. If the report performs any profiling, the `USAGE` file must also specify how to run the performance measurements.
+-   Report: A PDF version report must be included within the `.tar.gz` file. The report should describe and evaluate the optimizations you tried. The report does not have a page limit, but as usual, you should strive to be thorough, concise, and quantitative in your performance analysis.
+    The report must be named `report.pdf`
 
 Make sure you have a working CUDA implementation before applying any optimizations.
 
@@ -212,11 +235,11 @@ Make sure you have a working CUDA implementation before applying any optimizatio
 
 The serial version of the code is amiacable to many optimization oportunities, the following is an incomplete set of them:
 
-- Optimize the CUDA memory copies to decrease the overhead of memory transfers
-- Overlapping the memory transfer and the compute and/or independent computations using CUDA streams
-- Performing layout transformations to get coallessed accesses or to make better use of the cache
-- Using low precision to perform the computation (for example using `float16` or binary values)
-- Based on the size of the convolution, utilitize better algorithms to perform the computation (for example using the [Winograd Kernel][https://www.nervanasys.com/winograd-2/])
+-   Optimize the CUDA memory copies to decrease the overhead of memory transfers
+-   Overlapping the memory transfer and the compute and/or independent computations using CUDA streams
+-   Performing layout transformations to get coallessed accesses or to make better use of the cache
+-   Using low precision to perform the computation (for example using `float16` or binary values)
+-   Based on the size of the convolution, utilitize better algorithms to perform the computation (for example using the [Winograd Kernel][https://www.nervanasys.com/winograd-2/])
 
 ## Utility Functions
 
@@ -226,39 +249,37 @@ We provide a some helper utility functions in the [`utils.hpp`][utilshpp] file.
 
 In [`utils.hpp`][utilshpp] a function called `now()` which allows you to get the current time at a high resolution. To measure the overhead of a function `f(args...)`, the pattern to use is:
 
-~~~{.cpp}
+```{.cpp}
 const auto tic = now();
 f(args...);
 const auto toc = now();
 const auto elapsed = std::chrono::duration<double, std::milli>(toc - tic).count();;
 std::cout << "Calling f(args...) took " << elapsed << "milliseconds\n";
-~~~
-
+```
 
 ### Range For Loops
 
 Throughout the serial code, we use the [`range.hpp`][rangehpp] to make the code easier to understand. Essentially,
 
-
-~~~{.cpp}
+```{.cpp}
 for (const auto ii : range(0, N)) {
     do_stuff(ii);
 }
-~~~
+```
 
 Is equivalent to
 
-~~~{.cpp}
+```{.cpp}
 for (const auto ii = 0; ii < N; ii++) {
     do_stuff(ii);
 }
-~~~
+```
 
 ### Checking Errors
 
 To check for CUDA errors, specialize the `check_success` function in `utils.hpp` to also handle `cudaError_t`. For example:
 
-~~~{.cpp}
+```{.cpp}
 template <>
 bool check_success<cudaError_t>(const cudaError_t &err) {
   const auto res = err == cudaSuccess;
@@ -269,22 +290,26 @@ bool check_success<cudaError_t>(const cudaError_t &err) {
   assert(res);
   return res;
 }
-~~~
+```
 
 `check_success` can then be used when calling CUDA functions:
 
-~~~{.cpp}
+```{.cpp}
 check_success(cudaFree(deviceData));
-~~~
+```
 
 ## Reporting Issues
 
 Please use the [Github issue manager] to report any issues or suggestions about the project.
 
-
 [utilshpp]: https://github.com/webgpu/ece408project/blob/master/src/utils.hpp
+
 [cmakedoc]: https://cmake.org/cmake/help/latest/
+
 [hunterdoc]: https://docs.hunter.sh/en/latest/
+
 [rangehpp]: https://github.com/harrism/cpp11-range
-[Github issue manager]: https://github.com/webgpu/ece408project/issues
-[Hunter]: https://github.com/ruslo/hunter
+
+[github issue manager]: https://github.com/webgpu/ece408project/issues
+
+[hunter]: https://github.com/ruslo/hunter
