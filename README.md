@@ -6,7 +6,7 @@ The goal of this project is to accelerate the forward propagation step of the Co
 
 Read the book chapter and familiarize youself with the CNN algorithm.
 
-Provided is a model that has been trained using 60,000 examples (training set images) and the provided test data is 10,000 batched queries (test set images). The expected accuracy of the CNN is `~97%` on the provided test dataset.
+Provided is a model that has been trained using 60,000 examples (training set images) and the provided test data is 10,000 batched queries (test set images). The expected accuracy of the CNN is `~87%` on the provided test dataset.
 
 The data and model are in [HDF5](https://support.hdfgroup.org/HDF5/) format and we have provided the code to read the input model and the training dataset.
 
