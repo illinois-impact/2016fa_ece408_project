@@ -130,7 +130,47 @@ _NOTE:_ `nvvp` will only show performance metrics for GPU invocations, so it may
 
 ### Project Submission
 
-For the final submission, we are currently working on a script that would submit your job as well as notify the teaching assistants. That information will be available as soon as possible. Regardless, you will need the above credentials to make your final submission.
+You will use the same client (with certain options) for the final submission. The submission system notify the teaching assistants and record your ranking. You will need the above credentials to make your final submission.
+
+To submit your project, run
+
+```bash
+rai submit -d <project folder>
+```
+
+To perform the final project submission, you must have the `USAGE`, `README`, and `report.pdf` files in your project folder (as stated previously). The submission system ignores your `rai-build.yml` file and instead runs the following build file:
+
+```yaml
+rai:
+  version: 0.1
+resources:
+  gpus: 1
+commands:
+  build:
+    - echo "Submitting project"
+    - cp -r /src /build/submission_code
+    - cmake -DCONFIG_USE_HUNTER=OFF /src
+    - make
+    - /usr/bin/time ./ece408 /src/data/testfull.hdf5 /src/data/model.hdf5 10000
+```
+
+**NOTE::** Only your last submission is recorded, so please make sure that your last submission is the one you'd want to be graded.
+
+### Competition Rankings
+
+You can see the current rankings for the project competition by invoking
+
+```bash
+rai rankings
+```
+
+You can see only the top 10 teams by invoking
+
+
+```bash
+rai rankings -l 10
+```
+
 
 ### Reporting Issues
 
@@ -215,7 +255,7 @@ the `batch_size` must match the size of the dataset. If `batch_size` is unspecif
 
 ## How to Test
 
-Test your implementation with small batch size frist to verify the correctness. You can parse the `data/test100.hdf5` into smaller chuncks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in `data/test2.hdf5`, `data/test10.hdf5` and `data/test100.hdf5` in the data folder. Maker sure the data file you feed in has the same batch size as the `batch_size` you specify in the command line.
+Test your implementation with small batch size frist to verify the correctness. You can parse the `data/test100.hdf5` into smaller chunks using your preferred language(e.g. python). 2, 10 and 100 queries are provides in `data/test2.hdf5`, `data/test10.hdf5` and `data/test100.hdf5` in the data folder. Maker sure the data file you feed in has the same batch size as the `batch_size` you specify in the command line.
 
 ```{.sh}
 ./ece408 ../data/test10.hdf5 ../data/model.hdf5 10
@@ -231,9 +271,9 @@ A `.tar.gz` file which contains the report, code directory, the build scripts, a
 
 Make sure you have a working CUDA implementation before applying any optimizations.
 
-## Optimization Oportunities
+## Optimization Opportunities
 
-The serial version of the code is amiacable to many optimization oportunities, the following is an incomplete set of them:
+The serial version of the code is amicable to many optimization opportunities, the following is an incomplete set of them:
 
 -   Optimize the CUDA memory copies to decrease the overhead of memory transfers
 -   Overlapping the memory transfer and the compute and/or independent computations using CUDA streams
