@@ -138,7 +138,7 @@ To submit your project, run
 rai submit -d <project folder>
 ```
 
-To perform the final project submission, you must have the `USAGE`, `README`, and `report.pdf` files in your project folder (as stated in the "What to Deliver" section). The submission system ignores your `rai-build.yml` file and instead runs the following build file:
+To perform the final project submission, you must have the `USAGE`, `README`, and `report.pdf` files in your project folder (as stated in the ["What to Deliver"](#what-to-deliver) section). The submission system ignores your `rai-build.yml` file and instead runs the following build file:
 
 ```yaml
 rai:
